@@ -62,15 +62,31 @@ module PatternGeneratorTest();
         begin: testerWrap
             integer x, y;
             integer x1, x2;
-            for (y = 0; y < 33; y = y + 1) begin // move vertically
-                for (x = 0; x < 800; x = x + 128) begin // move horizontally
-                    for (x1 = 0; (x1 < 64) && (x+x1 < 800); x1 = x1 + 1) begin // alternate between Q1
-                        checkOutput(24'hFF33FF, y*800+x+x1);
-                    end
-                    for (x1 = 64; (x1 < 128) && (x+x1 < 800); x1 = x1 + 1) begin // and Q2
-                        checkOutput(24'hFF3333, y*800+x+x1); 
+            integer y1, y2;
+            for (y = 0; y < 33; y = y + 64) begin // move vertically
+                for (y1 = 0; (y1 < 32) && (y+y1 < 600); y1 = y1 + 1) begin // alternate between row 1
+
+
+                    for (x = 0; x < 800; x = x + 128) begin // move horizontally
+                        for (x1 = 0; (x1 < 64) && (x+x1 < 800); x1 = x1 + 1) begin // alternate between Q1
+                            checkOutput(24'hFF33FF, (y+y1)*800+x+x1);
+                        end
+                        for (x1 = 64; (x1 < 128) && (x+x1 < 800); x1 = x1 + 1) begin // and Q2
+                            checkOutput(24'hFF3333, (y+y1)*800+x+x1); 
+                        end
                     end
                 end
+                for (y1 = 32; (y1 < 64) && (y+y1 < 600); y1 = y1 + 1) begin // alternate between row 1
+                    for (x = 0; x < 800; x = x + 128) begin // move horizontally
+                        for (x1 = 0; (x1 < 64) && (x+x1 < 800); x1 = x1 + 1) begin // alternate between Q1
+                            checkOutput(24'h0065d9, (y+y1)*800+x+x1);
+                        end
+                        for (x1 = 64; (x1 < 128) && (x+x1 < 800); x1 = x1 + 1) begin // and Q2
+                            checkOutput(24'h62d900, (y+y1)*800+x+x1); 
+                        end
+                    end
+                end
+
             end
 
         end
