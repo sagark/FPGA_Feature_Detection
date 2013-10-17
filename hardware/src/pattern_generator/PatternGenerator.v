@@ -25,6 +25,19 @@ module PatternGenerator(
 	reg VState;
 	reg [23:0] OrigVideo;
 
+	reg last_horiz_position;
+	reg last_vertical_position;
+	reg last_frame_in_sec;
+
+	always @(*) begin
+		if (horiz_pixel_count == (VISIBLE_WIDTH-1)) last_horiz_position = 1;
+		else last_horiz_position = 0;
+		if (vertical_pixel_count == (VISIBLE_HEIGHT-1)) last_vertical_position = 1;
+		else last_vertical_position = 0;
+		if (frame_count == (FRAME_RATE-1)) last_frame_in_sec = 1;
+		else last_frame_in_sec = 0;
+	end
+
 	always @(posedge clock)
 		if (reset) VideoValid <= 0;
 		else if (VideoReady) VideoValid <= 1;
@@ -33,38 +46,38 @@ module PatternGenerator(
 	// This is used to count 72 frames and then wrap around. Used to invert colors at 1Hz
 	always @(posedge clock)
 		if (reset) frame_count <= 0;
-		else if ((horiz_pixel_count == (VISIBLE_WIDTH-1)) & (vertical_pixel_count == (VISIBLE_HEIGHT-1)) & VideoValid)
-			if (frame_count == (FRAME_RATE-1)) frame_count <= 0;
+		else if (last_horiz_position & last_vertical_position & VideoValid)
+			if (last_frame_in_sec) frame_count <= 0;
 			else frame_count <= frame_count + 1;
 
 	// This is used to keep track of horizontal position in the frame
 	always @(posedge clock)
 		if (reset) horiz_pixel_count <= 0;
-		else if ((horiz_pixel_count == (VISIBLE_WIDTH-1)) & VideoValid) horiz_pixel_count <= 0;
+		else if (last_horiz_position & VideoValid) horiz_pixel_count <= 0;
 		else if (VideoValid) horiz_pixel_count <= horiz_pixel_count + 1;
 
 	// This is used to keep track of vertical position in the frame
 	always @(posedge clock)
 		if (reset) vertical_pixel_count <= 0;
-		else if ((horiz_pixel_count == (VISIBLE_WIDTH-1)) & VideoValid)
-			if (vertical_pixel_count == (VISIBLE_HEIGHT-1)) vertical_pixel_count <= 0;
+		else if (last_horiz_position & VideoValid)
+			if (last_vertical_position) vertical_pixel_count <= 0;
 			else vertical_pixel_count <= vertical_pixel_count + 1;
 
 	// This is used to determine if pre-defined colors should be inverted
 	always @(posedge clock)
 		if (reset) invert <= 0;
-		else if ((frame_count == (FRAME_RATE-1)) & VideoValid) invert <= ~invert;
+		else if (last_frame_in_sec & last_horiz_position & last_vertical_position & VideoValid) invert <= ~invert;
 
 	// FSM for Horizontal Pattern. Each block in the pattern is 128 pixels wide and each sub-block is 64 pixels wide
 	always @(posedge clock)
 		if (reset) HState <= 0;
-		else if ((horiz_pixel_count == (VISIBLE_WIDTH-1)) & VideoValid) HState <= 0;
+		else if (last_horiz_position & VideoValid) HState <= 0;
 		else if ((&horiz_pixel_count[5:0]) & VideoValid) HState <= ~HState;
 
-	// FSM for Veretical Pattern. Each block in the pattern is 64 pixels tall and each sub-block is 32 pixels tall
+	// FSM for Vertical Pattern. Each block in the pattern is 64 pixels tall and each sub-block is 32 pixels tall
 	always @(posedge clock)
 		if (reset) VState <= 0;
-		else if ((horiz_pixel_count == (VISIBLE_WIDTH-1)) & (vertical_pixel_count == (VISIBLE_HEIGHT-1)) & VideoValid) VState <= 0;
+		else if (last_horiz_position & last_vertical_position & VideoValid) VState <= 0;
 		else if ((&vertical_pixel_count[4:0]) & VideoValid) VState <= ~VState;
 
 	always @(*)
