@@ -78,7 +78,7 @@ module PatternGenerator(
 	always @(posedge clock)
 		if (reset) VState <= 0;
 		else if (last_horiz_position & last_vertical_position & VideoValid) VState <= 0;
-		else if ((&vertical_pixel_count[4:0]) & VideoValid) VState <= ~VState;
+		else if (last_horiz_position & (&vertical_pixel_count[4:0]) & VideoValid) VState <= ~VState;
 
 	always @(*)
 		if (~HState & ~VState) OrigVideo = Q1_color;
