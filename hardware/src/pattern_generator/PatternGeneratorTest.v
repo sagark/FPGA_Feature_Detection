@@ -63,34 +63,51 @@ module PatternGeneratorTest();
             integer x, y;
             integer x1, x2;
             integer y1, y2;
-            for (y = 0; y < 33; y = y + 64) begin // move vertically
-                for (y1 = 0; (y1 < 32) && (y+y1 < 600); y1 = y1 + 1) begin // alternate between row 1
+            integer f, numFrames;
+            integer c1, c2, c3, c4;
+            numFrames = 100; // test 72 inverted frames and the first non-inverted frame
 
+            c1 = 24'h00CC00;
+            c2 = 24'h00CCCC;
+            c3 = 24'hFF9A26;
+            c4 = 24'h9D26FF;
+ 
+            for (f = 0; f < numFrames; f = f + 1) begin // loop over frame
 
-                    for (x = 0; x < 800; x = x + 128) begin // move horizontally
-                        for (x1 = 0; (x1 < 64) && (x+x1 < 800); x1 = x1 + 1) begin // alternate between Q1
-                            checkOutput(24'hFF33FF, (y+y1)*800+x+x1);
-                        end
-                        for (x1 = 64; (x1 < 128) && (x+x1 < 800); x1 = x1 + 1) begin // and Q2
-                            checkOutput(24'hFF3333, (y+y1)*800+x+x1); 
-                        end
-                    end
-                end
-                for (y1 = 32; (y1 < 64) && (y+y1 < 600); y1 = y1 + 1) begin // alternate between row 1
-                    for (x = 0; x < 800; x = x + 128) begin // move horizontally
-                        for (x1 = 0; (x1 < 64) && (x+x1 < 800); x1 = x1 + 1) begin // alternate between Q1
-                            checkOutput(24'h0065d9, (y+y1)*800+x+x1);
-                        end
-                        for (x1 = 64; (x1 < 128) && (x+x1 < 800); x1 = x1 + 1) begin // and Q2
-                            checkOutput(24'h62d900, (y+y1)*800+x+x1); 
-                        end
-                    end
+                if (f % 72 === 0) begin // invert testing colors every 72 frames
+                    c1 = ~c1;
+                    c2 = ~c2;
+                    c3 = ~c3;
+                    c4 = ~c4;
                 end
 
+                // start loop that generates full frame
+                for (y = 0; y < 600; y = y + 64) begin // move vertically
+                    for (y1 = 0; (y1 < 32) && (y+y1 < 600); y1 = y1 + 1) begin // alternate between row 1
+                        for (x = 0; x < 800; x = x + 128) begin // move horizontally
+                            for (x1 = 0; (x1 < 64) && (x+x1 < 800); x1 = x1 + 1) begin // alternate between Q1
+                                checkOutput(c1, (y+y1)*800+x+x1);
+                            end
+                            for (x1 = 64; (x1 < 128) && (x+x1 < 800); x1 = x1 + 1) begin // and Q2
+                                checkOutput(c2, (y+y1)*800+x+x1); 
+                            end
+                        end
+                    end
+                    for (y1 = 32; (y1 < 64) && (y+y1 < 600); y1 = y1 + 1) begin // alternate between row 1
+                        for (x = 0; x < 800; x = x + 128) begin // move horizontally
+                            for (x1 = 0; (x1 < 64) && (x+x1 < 800); x1 = x1 + 1) begin // alternate between Q1
+                                checkOutput(c3, (y+y1)*800+x+x1);
+                            end
+                            for (x1 = 64; (x1 < 128) && (x+x1 < 800); x1 = x1 + 1) begin // and Q2
+                                checkOutput(c4, (y+y1)*800+x+x1); 
+                            end
+                        end
+                    end
+                end // end loop that generates full frame
+                $display("done frame #%d", f);
             end
-
+            $display("All tests pass");
         end
-
     end
 endmodule
 
