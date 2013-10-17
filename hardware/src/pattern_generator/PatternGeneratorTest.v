@@ -38,8 +38,11 @@ module PatternGeneratorTest();
         input [32:0] countInput;
         begin
             #2 // give it 10ns to start generating output
-            $display("Expected: 0x%h, Got: 0x%h, VidValid: 0x%h, PixelNum: %d", ExpVidSignalIn, video, videoValid, countInput);
-            //$finish();
+            if (ExpVidSignalIn !== video) begin
+                $display("Expected: 0x%h, Got: 0x%h, VidValid: 0x%h, PixelNum: %d", 
+                                     ExpVidSignalIn, video, videoValid, countInput);
+                $finish();
+            end
         end
     endtask
 
@@ -59,7 +62,7 @@ module PatternGeneratorTest();
         begin: testerWrap
             integer x, y;
             integer x1, x2;
-            for (y = 0; y < 1; y = y + 1) begin // move vertically
+            for (y = 0; y < 33; y = y + 1) begin // move vertically
                 for (x = 0; x < 800; x = x + 128) begin // move horizontally
                     for (x1 = 0; (x1 < 64) && (x+x1 < 800); x1 = x1 + 1) begin // alternate between Q1
                         checkOutput(24'hFF33FF, y*800+x+x1);
