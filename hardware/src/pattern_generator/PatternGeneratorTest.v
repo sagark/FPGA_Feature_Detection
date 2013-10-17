@@ -23,29 +23,23 @@ module PatternGeneratorTest();
     wire [23:0] video;
     wire videoValid;
 
-
-    task checkOutput;
-        input [23:0] ExpVidSignalIn;
-        begin : tester
-            integer c;
+    task initGenerator;
+        begin
             rst = 1;
             vidRed = 0;
             #2
-
             rst = 0;
             vidRed = 1;
+        end
+    endtask
 
-            for (c = 0; c < 800*600*72-100; c = c + 1) begin
-                #2 // give it 10ns to start generating output
-                //$display("Expected: 0x%h, Got: 0x%h, VidValid: 0x%h, PixelNum: %d", ExpVidSignalIn, video, videoValid, c);
-                ;
-            end              
-
-            for (c = 800*600*72-100; c < 800*600*72+10; c = c + 1) begin
-                #2 // give it 10ns to start generating output
-                $display("Expected: 0x%h, Got: 0x%h, VidValid: 0x%h, PixelNum: %d", ExpVidSignalIn, video, videoValid, c);
-            end
-            $finish();
+    task checkOutput;
+        input [23:0] ExpVidSignalIn;
+        input [32:0] countInput;
+        begin
+            #2 // give it 10ns to start generating output
+            $display("Expected: 0x%h, Got: 0x%h, VidValid: 0x%h, PixelNum: %d", ExpVidSignalIn, video, videoValid, countInput);
+            //$finish();
         end
     endtask
 
@@ -60,7 +54,23 @@ module PatternGeneratorTest();
 
 
     initial begin 
-        checkOutput(0);
+        initGenerator();
+
+        begin: testerWrap
+            integer x, y;
+            integer x1, x2;
+            for (y = 0; y < 1; y = y + 1) begin // move vertically
+                for (x = 0; x < 800; x = x + 128) begin // move horizontally
+                    for (x1 = 0; (x1 < 64) && (x+x1 < 800); x1 = x1 + 1) begin // alternate between Q1
+                        checkOutput(24'hFF33FF, y*800+x+x1);
+                    end
+                    for (x1 = 64; (x1 < 128) && (x+x1 < 800); x1 = x1 + 1) begin // and Q2
+                        checkOutput(24'hFF3333, y*800+x+x1); 
+                    end
+                end
+            end
+
+        end
 
     end
 endmodule
