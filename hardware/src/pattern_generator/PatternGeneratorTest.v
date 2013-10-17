@@ -105,6 +105,12 @@ module PatternGeneratorTest();
                     end
                 end // end loop that generates full frame
                 $display("done frame #%d", f);
+
+                $display("now testing video_ready on/off");
+                vidRed = 0;
+                #10 // simulate DVI pausing for 5 clock cycles
+                vidRed = 1;
+
             end
             $display("All tests pass");
         end
