@@ -4,18 +4,12 @@
 
 
 module PatternGeneratorTest();
-
-
-    parameter Halfcycle = 1; // half period is 5 nanoseconds
-
-    localparam Cycle = 2*Halfcycle;
-
-    reg Clock;
-
     // Clock generation
+    parameter Halfcycle = 1; // half period is 5 nanoseconds
+    localparam Cycle = 2*Halfcycle;
+    reg Clock;
     initial Clock = 0;
     always #(Halfcycle) Clock = ~Clock;
-
 
     // dut test wires
     reg rst;
@@ -23,6 +17,7 @@ module PatternGeneratorTest();
     wire [23:0] video;
     wire videoValid;
 
+    // prep dut for first run
     task initGenerator;
         begin
             rst = 1;
@@ -33,20 +28,21 @@ module PatternGeneratorTest();
         end
     endtask
 
+    // test exp output / real output, report err
     task checkOutput;
         input [23:0] ExpVidSignalIn;
         input [32:0] countInput;
         begin
             #2 // give it 10ns to start generating output
             if (ExpVidSignalIn !== video) begin
-                $display("Expected: 0x%h, Got: 0x%h, VidValid: 0x%h, PixelNum: %d", 
+                $display("FAILURE: Expected: 0x%h, Got: 0x%h, VidValid: 0x%h, PixelNum: %d", 
                                      ExpVidSignalIn, video, videoValid, countInput);
                 $finish();
             end
         end
     endtask
 
-
+    // device under test
     PatternGenerator dut(
         .reset(rst), 
         .clock(Clock),
@@ -58,7 +54,6 @@ module PatternGeneratorTest();
 
     initial begin 
         initGenerator();
-
         begin: testerWrap
             integer x, y;
             integer x1, x2;
@@ -112,7 +107,8 @@ module PatternGeneratorTest();
                 vidRed = 1;
 
             end
-            $display("All tests pass");
+            $display("ALL TESTS PASS. SUCCESSFULLY GENERATED %d FRAMES.", numFrames);
+            $finish(); // stop running, all tests pass
         end
     end
 endmodule

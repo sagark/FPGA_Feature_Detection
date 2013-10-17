@@ -12,7 +12,8 @@ module PatternGenerator(
 	parameter VISIBLE_HEIGHT = 10'd600;
 	parameter FRAME_RATE = 7'd72;
 
-	parameter Q1_color = 24'h00CC00;
+	//parameter Q1_color = 24'h00CC01; // BAD color value to inject error
+	parameter Q1_color = 24'h00CC00; // CORRECT color value for Q1
 	parameter Q2_color = 24'h00CCCC;
 	parameter Q3_color = 24'hFF9A26;
 	parameter Q4_color = 24'h9D26FF;
