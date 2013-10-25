@@ -118,6 +118,8 @@ module FPGA_TOP_ML505(
   wire dvi_swap, dvi_swap_ack;
   wire bg_start, bg_start_ack;
   wire bg_done, bg_done_ack;
+  wire ol_start, ol_start_ack;
+  wire ol_done, ol_done_ack;
 
   SwapController sc(
     .clock(clk_10M),
@@ -127,7 +129,11 @@ module FPGA_TOP_ML505(
     .bg_start(bg_start),
     .bg_start_ack(bg_start_ack),
     .bg_done(bg_done),
-    .bg_done_ack(bg_done_ack));
+    .bg_done_ack(bg_done_ack),
+    .ol_start(ol_start),
+    .ol_start_ack(ol_start_ack),
+    .ol_done(ol_done),
+    .ol_done_ack(ol_done_ack));
 
   // -- |Image Buffer Writer| --------------------------------------------------
   `define IMAGE_WRITER_ENABLE
@@ -156,6 +162,34 @@ module FPGA_TOP_ML505(
       .ready(bg_ready));
 
   `endif // IMAGE_WRITER_ENABLE
+
+  // -- |Overlay| --------------------------------------------------
+  `define OVERLAY_ENABLE
+  
+  `ifdef OVERLAY_ENABLE
+    localparam N_PIXEL_2 = 480000;
+
+    wire ol_clock;
+    assign ol_clock = clk_10M;
+
+    wire [53:0] ol_dout;
+    wire ol_valid,ol_ready;
+
+    Overlay #(
+      .N_PIXEL(N_PIXEL_2))
+    over (
+      .clock(ol_clock),
+      .reset(reset),
+      .scroll(GPIO_DIP[0]),
+      .start(ol_start),
+      .start_ack(ol_start_ack),
+      .done(ol_done),
+      .done_ack(ol_done_ack),
+      .dout(ol_dout),
+      .valid(ol_valid),
+      .ready(ol_ready));
+
+  `endif // OVERLAY_ENABLE
 
   // -- |Image Buffer Reader| --------------------------------------------------
   `define IMAGE_READER_ENABLE
