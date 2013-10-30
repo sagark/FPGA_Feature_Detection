@@ -47,35 +47,105 @@ module SramArbiter(
 // The SRAM_WRITE_FIFOis have been instantiated for you, but you must wire it
 // correctly
 
-SRAM_WRITE_FIFO w0_fifo(
-  .rst(),
-  .wr_clk(),
-  .din(),
-  .wr_en(),
-  .full(),
+// following 3 lines handle correctly asserting w0_din_ready and w1_din_ready
+wire w0_full, w1_full;
+assign w0_din_ready = !w0_full;
+assign w1_din_ready = !w1_full;
 
-  .rd_clk(),
+SRAM_WRITE_FIFO w0_fifo(
+  .rst(reset),
+  .wr_clk(w0_clock),
+  .din(w0_din),
+  .wr_en(w0_din_valid),
+  .full(w0_full),
+
+  .rd_clk(sram_clock), //sram_clock is our "internal clock"
   .rd_en(),
-  .valid(),
+  .valid(w0_valid),
   .dout(),
   .empty());
 
 SRAM_WRITE_FIFO w1_fifo(
-  .rst(),
-  .wr_clk(),
-  .din(),
-  .wr_en(),
-  .full(),
+  .rst(reset),
+  .wr_clk(w1_clock),
+  .din(w1_din),
+  .wr_en(w1_din_valid),
+  .full(w1_full),
 
-  .rd_clk(),
+  .rd_clk(sram_clock), //sram_clock is our "internal clock"
   .rd_en(),
-  .valid(),
+  .valid(w1_valid),
   .dout(),
   .empty());
 
 // Instantiate the Read FIFOs here
 
 // Arbiter Logic ---------------------------------------------------------------
+
+reg [2:0] readshift;
+reg [2:0] CurrentState;
+reg [2:0] NextState;
+
+
+localparam DOW0 = 3'b000,
+           DOW1 = 3'b001,
+           DOR0 = 3'b010,
+           DOR1 = 3'b011,
+           PAUSE = 3'b100;
+
+
+always @(posedge sram_clock) begin
+    if (reset) CurrentState <= PAUSE;
+    else CurrentState <= NextState;
+end
+
+wire w0_valid;
+wire w1_valid;
+
+always @(*) begin
+    case(CurrentState) begin
+        PAUSE: begin
+            if(w0_valid) NextState = DOW0;
+            else if(w1_valid) NextState = DOW1;
+            else if( R0 COND HERE ) NextState = DOR0;
+            else if( R1 COND HERE ) NextState = DOR1;
+            else NextState = PAUSE;
+        end
+
+        DOW0: begin
+            if(w1_valid) NextState = DOW1;
+            else if( R0 COND HERE ) NextState = DOR0;
+            else if( R1 COND HERE ) NextState = DOR1;
+            else if(w0_valid) NextState = DOW0;
+            else NextState = PAUSE;
+        end
+
+        DOW1: begin
+            if( R0 COND HERE ) NextState = DOR0;
+            else if( R1 COND HERE ) NextState = DOR1;
+            else if(w0_valid) NextState = DOW0;
+            else if(w1_valid) NextState = DOW1;
+            else NextState = PAUSE;
+        end
+
+        DOR0: begin
+            if( R1 COND HERE ) NextState = DOR1;
+            else if(w0_valid) NextState = DOW0;
+            else if(w1_valid) NextState = DOW1;
+            else if( R0 COND HERE ) NextState = DOR0;
+            else NextState = PAUSE;
+        end
+
+        DOR1: begin
+            if(w0_valid) NextState = DOW0;
+            else if(w1_valid) NextState = DOW1;
+            else if( R0 COND HERE ) NextState = DOR0;
+            else if( R1 COND HERE ) NextState = DOR1;
+            else NextState = PAUSE;
+        end
+
+    end
+end
 
 // Put your round-robin arbitration logic here
 
