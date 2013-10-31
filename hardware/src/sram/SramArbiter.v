@@ -57,45 +57,41 @@ localparam DOW0 = 3'b000,
            DOR1 = 3'b011,
            PAUSE = 3'b100;
 
-
-reg [2:0] readshift; // potential for off by one error - might need to be 3:0
+// Arbiter States
 reg [2:0] CurrentState;
 reg [2:0] NextState;
 
+wire w0_valid; // if there are pending writes in the W0 fifo
+wire w1_valid; // if there are pending writes in the W1 fifo
 
-wire w0_valid;
-wire w1_valid;
-
-reg next2;
-reg this0; // current cycle's read (only "valid" if this is a read)
-reg this1;
-reg this2;
-
-
-
-wire w0_rd_en, w1_rd_en;
-wire w0empty, w1empty;
-wire [53:0] w0dout, w1dout;
-
-wire r0_data_write, r1_data_write;
-
-wire r0_data_full, r1_data_full;
-
-wire r0_read_valid, r1_read_valid;
-wire r0_addr, r1_addr;
-
-wire r0_rd_en, r1_rd_en;
+// bank of registers for keeping track of which read port data read from the
+// SRAM needs to go 0 = R0, 1 = R1
+reg next2; // next 3 cycle delay read-to port
+reg this0; // current cycle's read-to port (only "valid" if this is a read)
+reg this1; // next cycle's read-to port
+reg this2; // next-next cycle's read-to-port
 
 
+wire w0_rd_en, w1_rd_en; // enable reading from the SRAM_WRITE_FIFOs in DOW0 or DOW1
+wire [53:0] w0dout, w1dout; // consists of {Write Mask, Addr, Data}
 
+wire r0_data_write, r1_data_write; // write_enables for the Read DATA FIFOs, assigned below
 
-// following 3 lines handle correctly asserting w0_din_ready and w1_din_ready
-wire w0_full, w1_full;
-assign w0_din_ready = !w0_full;
-assign w1_din_ready = !w1_full;
+wire r0_data_full, r1_data_full; // FULL marker for READ ADDR FIFOs. should eventually be
+                                 // unnecessary when "backpressure" implemented
 
-assign w0_rd_en = (CurrentState == DOW0);
-assign w1_rd_en = (CurrentState == DOW1);
+wire r0_read_valid, r1_read_valid; // whether or not there are pending read requests 
+                                   // addresses waiting in READ ADDR FIFO
+
+wire r0_addr, r1_addr; // address value read from READ ADDR FIFO
+wire r0_rd_en, r1_rd_en; // enable reading from READ ADDR FIFO to issue read req in DOR0 or DOR1
+
+wire w0_full, w1_full; // asserted when SRAM_WRITE_FIFOs are full
+assign w0_din_ready = !w0_full; // if full, not ready (no more requests)
+assign w1_din_ready = !w1_full; // if full, not ready (no more requests)
+
+assign w0_rd_en = (CurrentState == DOW0); // issue write to SRAM if we're in DOW0
+assign w1_rd_en = (CurrentState == DOW1); // issue write to SRAM if we're in DOW1
 
 //this is fine because we don't care what's on the sram_data_in line on R0 and R1
 assign sram_data_in = (CurrentState == DOW0) ? w0dout[31:0] : w1dout[31:0];
@@ -111,7 +107,7 @@ SRAM_WRITE_FIFO w0_fifo(
   .full(w0_full),
 
   .rd_clk(sram_clock), //sram_clock is our "internal clock"
-  .rd_en(w0_rd_en),
+  .rd_en(w0_rd_en), //assigned to (CurrentState == DOW0)
   .valid(w0_valid),
   .dout(w0dout),
   .empty()); // unused?
@@ -124,7 +120,7 @@ SRAM_WRITE_FIFO w1_fifo(
   .full(w1_full),
 
   .rd_clk(sram_clock), //sram_clock is our "internal clock"
-  .rd_en(w1_rd_en),
+  .rd_en(w1_rd_en), //assigned to (CurrentState == DOW1)
   .valid(w1_valid),
   .dout(w1dout),
   .empty()); // unused?
@@ -134,6 +130,11 @@ SRAM_WRITE_FIFO w1_fifo(
 assign r0_data_write = sram_data_out_valid & (!this0);
 assign r1_data_write = sram_data_out_valid & this0;
 
+assign r0_din_ready = !r0_data_full; // TODO: backpressure
+assign r1_din_ready = !r1_data_full; // TODO: backpressure
+
+assign r0_rd_en = (CurrentState == DOR0);
+assign r1_rd_en = (CurrentState == DOR1);
 
 SRAM_DATA_FIFO r0_data_fifo(
   .rst(reset),
@@ -149,7 +150,6 @@ SRAM_DATA_FIFO r0_data_fifo(
   .empty(),
   .prog_full());
 
-
 SRAM_DATA_FIFO r1_data_fifo(
   .rst(reset),
   .wr_clk(sram_clock),
@@ -163,11 +163,6 @@ SRAM_DATA_FIFO r1_data_fifo(
   .dout(r1_dout),
   .empty(),
   .prog_full());
-
-assign r0_din_ready = !r0_data_full; // TODO: backpressure
-assign r1_din_ready = !r1_data_full; // TODO: backpressure
-assign r0_rd_en = (CurrentState == DOR0);
-assign r1_rd_en = (CurrentState == DOR1);
 
 SRAM_ADDR_FIFO r0_addr_fifo(
   .rst(reset),
@@ -196,8 +191,6 @@ SRAM_ADDR_FIFO r1_addr_fifo(
   .empty()); //unused?
 
 
-// Arbiter Logic ---------------------------------------------------------------
-
 `ifdef MODELSIM // Output for testbench
 always @(*)
   if (currentState == DOW0) state = 3'b00;
@@ -207,9 +200,6 @@ always @(*)
   else if (currentState == PAUSE) state = 3'b100;
   else state = 3'b111;
 `endif
-
-// need reg to keep track of whether or not a read is supposed to happen next
-// cycle
 
 
 always @(posedge sram_clock) begin
@@ -275,6 +265,5 @@ always @(*) begin
     endcase
 end
 
-// Put your round-robin arbitration logic here
 
 endmodule
