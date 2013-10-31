@@ -38,11 +38,11 @@ module SramArbiter(
 
   // SRAM Interface
   input         sram_clock,
-  output        sram_addr_valid,
-  input         sram_ready,
+  output        sram_addr_valid, // assigned
+  input         sram_ready, //TODO WHAT TO DO WITH THIS?
   output [17:0] sram_addr,
-  output [31:0] sram_data_in,
-  output  [3:0] sram_write_mask,
+  output [31:0] sram_data_in, // assigned
+  output  [3:0] sram_write_mask, // assigned
   input  [31:0] sram_data_out,
   input         sram_data_out_valid);
 
@@ -51,10 +51,27 @@ module SramArbiter(
 // The SRAM_WRITE_FIFOis have been instantiated for you, but you must wire it
 // correctly
 
+wire w0_rd_en, w1_rd_en;
+wire cdow0, cdow1; //"can do W0"
+wire w0empty, w1empty;
+wire [53:0] w0dout, w1dout;
+
 // following 3 lines handle correctly asserting w0_din_ready and w1_din_ready
 wire w0_full, w1_full;
 assign w0_din_ready = !w0_full;
 assign w1_din_ready = !w1_full;
+
+assign w0_rd_en = (CurrentState == DOW0);
+assign w1_rd_en = (CurrentState == DOW1);
+
+assign cdow0 = !w0empty;
+assign cdow1 = !w1empty;
+
+//this is fine because we don't care what's on the sram_data_in line on R0 and R1
+assign sram_data_in = (CurrentState == DOW0) ? w0dout[31:0] : w1dout[31:0];
+assign sram_write_mask = (CurrentState == DOW0) ? w0dout[53:50] : ((CurrentState == DOW1) ? w1dout[53:50] : 4'b0000)
+assign sram_addr = ////TODO
+assign sram_addr_valid = (CurrentState == DOW0 || CurrentState == DOW1 || CurrentState == DOR0 || CurrentState == DOR1);
 
 SRAM_WRITE_FIFO w0_fifo(
   .rst(reset),
@@ -64,10 +81,10 @@ SRAM_WRITE_FIFO w0_fifo(
   .full(w0_full),
 
   .rd_clk(sram_clock), //sram_clock is our "internal clock"
-  .rd_en(),
+  .rd_en(w0_rd_en),
   .valid(w0_valid),
-  .dout(),
-  .empty());
+  .dout(w0dout),
+  .empty(w0empty));
 
 SRAM_WRITE_FIFO w1_fifo(
   .rst(reset),
@@ -77,49 +94,51 @@ SRAM_WRITE_FIFO w1_fifo(
   .full(w1_full),
 
   .rd_clk(sram_clock), //sram_clock is our "internal clock"
-  .rd_en(),
+  .rd_en(w1_rd_en),
   .valid(w1_valid),
-  .dout(),
-  .empty());
+  .dout(w1dout),
+  .empty(w1empty));
+
 
 // Instantiate the Read FIFOs here
 
+
 SRAM_DATA_FIFO r0_data_fifo(
   .rst(reset),
-  .wr_clk(),
+  .wr_clk(sram_clock),
   .din(),
   .wr_en(),
   .full(),
 
-  .rd_clk(),
+  .rd_clk(r0_clock),
   .rd_en(),
   .valid(),
-  .dout(),
+  .dout(r0_dout),
   .empty()
   .prog_full());
 
 SRAM_DATA_FIFO r1_data_fifo(
   .rst(reset),
-  .wr_clk(),
+  .wr_clk(sram_clock),
   .din(),
   .wr_en(),
   .full(),
 
-  .rd_clk(),
+  .rd_clk(r1_clock),
   .rd_en(),
   .valid(),
-  .dout(),
+  .dout(r1_dout),
   .empty()
   .prog_full());
 
 SRAM_ADDR_FIFO r0_addr_fifo(
   .rst(reset),
-  .wr_clk(),
+  .wr_clk(r0_clock),
   .din(),
   .wr_en(),
   .full(),
 
-  .rd_clk(),
+  .rd_clk(sram_clock),
   .rd_en(),
   .valid(),
   .dout(),
@@ -127,12 +146,12 @@ SRAM_ADDR_FIFO r0_addr_fifo(
 
 SRAM_ADDR_FIFO r1_addr_fifo(
   .rst(reset),
-  .wr_clk(),
+  .wr_clk(r1_clock),
   .din(),
   .wr_en(),
   .full(),
 
-  .rd_clk(),
+  .rd_clk(sram_clock),
   .rd_en(),
   .valid(),
   .dout(),
@@ -166,12 +185,28 @@ localparam DOW0 = 3'b000,
 
 
 always @(posedge sram_clock) begin
-    if (reset) CurrentState <= PAUSE;
-    else CurrentState <= NextState;
+    if (reset) begin
+        CurrentState <= PAUSE;
+        this0 <= 1'b0;
+        this1 <= 1'b0;
+        this2 <= 1'b0;
+    end
+    else begin
+        CurrentState <= NextState;
+        this0 <= this1;
+        this1 <= this2;
+        this2 <= next2;
+    end
 end
 
 wire w0_valid;
 wire w1_valid;
+
+reg next2;
+reg this0; // current cycle's read (only "valid" if this is a read)
+reg this1;
+reg this2;
+
 
 always @(*) begin
     case(CurrentState) begin
@@ -200,6 +235,7 @@ always @(*) begin
         end
 
         DOR0: begin
+            next2 = 1'b0;
             if( R1 COND HERE ) NextState = DOR1;
             else if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
@@ -208,6 +244,7 @@ always @(*) begin
         end
 
         DOR1: begin
+            next2 = 1'b1;
             if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
             else if( R0 COND HERE ) NextState = DOR0;
