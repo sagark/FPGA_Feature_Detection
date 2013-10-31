@@ -32,6 +32,10 @@ module SramArbiter(
   output        r1_dout_valid,
   output [31:0] r1_dout, // data
 
+  `ifdef MODELSIM // Output for testbench
+  output reg [2:0] state;
+  `endif
+
   // SRAM Interface
   input         sram_clock,
   output        sram_addr_valid,
@@ -140,6 +144,16 @@ SRAM_ADDR_FIFO r1_addr_fifo(
 reg [2:0] readshift; // potential for off by one error - might need to be 3:0
 reg [2:0] CurrentState;
 reg [2:0] NextState;
+
+`ifdef MODELSIM // Output for testbench
+always @(*)
+  if (currentState == DOW0) state = 3'b00;
+  else if (currentState == DOW1) state = 3'b001;
+  else if (currentState == DOR0) state = 3'b010;
+  else if (currentState == DOR1) state = 3'b011;
+  else if (currentState == PAUSE) state = 3'b100;
+  else state = 3'b111;
+`endif
 
 // need reg to keep track of whether or not a read is supposed to happen next
 // cycle
