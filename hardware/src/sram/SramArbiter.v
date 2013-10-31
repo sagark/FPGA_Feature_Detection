@@ -80,12 +80,69 @@ SRAM_WRITE_FIFO w1_fifo(
 
 // Instantiate the Read FIFOs here
 
+SRAM_DATA_FIFO r0_data_fifo(
+  .rst(reset),
+  .wr_clk(),
+  .din(),
+  .wr_en(),
+  .full(),
+
+  .rd_clk(),
+  .rd_en(),
+  .valid(),
+  .dout(),
+  .empty()
+  .prog_full());
+
+SRAM_DATA_FIFO r1_data_fifo(
+  .rst(reset),
+  .wr_clk(),
+  .din(),
+  .wr_en(),
+  .full(),
+
+  .rd_clk(),
+  .rd_en(),
+  .valid(),
+  .dout(),
+  .empty()
+  .prog_full());
+
+SRAM_ADDR_FIFO r0_addr_fifo(
+  .rst(reset),
+  .wr_clk(),
+  .din(),
+  .wr_en(),
+  .full(),
+
+  .rd_clk(),
+  .rd_en(),
+  .valid(),
+  .dout(),
+  .empty());
+
+SRAM_ADDR_FIFO r1_addr_fifo(
+  .rst(reset),
+  .wr_clk(),
+  .din(),
+  .wr_en(),
+  .full(),
+
+  .rd_clk(),
+  .rd_en(),
+  .valid(),
+  .dout(),
+  .empty());
+
+
 // Arbiter Logic ---------------------------------------------------------------
 
-reg [2:0] readshift;
+reg [2:0] readshift; // potential for off by one error - might need to be 3:0
 reg [2:0] CurrentState;
 reg [2:0] NextState;
 
+// need reg to keep track of whether or not a read is supposed to happen next
+// cycle
 
 localparam DOW0 = 3'b000,
            DOW1 = 3'b001,
