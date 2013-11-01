@@ -34,11 +34,11 @@ module SramArbiter(
 
   `define MODELSIM
   `ifdef MODELSIM // Output for testbench
-  output reg [2:0] state;
-  output wire r0_data_write_output;
-  output wire r1_data_write_output;
-  output wire r0_rd_en_output;
-  output wire r1_rd_en_output;
+  output reg [2:0] state,
+  output wire r0_data_write_output,
+  output wire r1_data_write_output,
+  output wire r0_rd_en_output,
+  output wire r1_rd_en_output,
   `endif
 
   // SRAM Interface
@@ -114,6 +114,9 @@ assign sram_write_mask = (CurrentState == DOW0) ? w0dout[53:50] : ((CurrentState
 assign sram_addr = (CurrentState == DOW0) ? w0dout[49:32] : ((CurrentState == DOW1) ? w1dout[49:32] : ((CurrentState == DOR0) ? r0_addr : ((CurrentState == DOR1) ? r1_addr : 0)));
 assign sram_addr_valid = (CurrentState == DOW0 || CurrentState == DOW1 || CurrentState == DOR0 || CurrentState == DOR1);
 
+`ifdef MODELSIM
+  assign w0_valid = w0_din_valid; // Use input to directly change state
+`else
 SRAM_WRITE_FIFO w0_fifo(
   .rst(reset),
   .wr_clk(w0_clock),
@@ -126,7 +129,11 @@ SRAM_WRITE_FIFO w0_fifo(
   .valid(w0_valid),
   .dout(w0dout),
   .empty()); // unused?
+`endif
 
+`ifdef MODELSIM
+  assign w1_valid = w0_din_valid; // Use input to directly change state
+`else
 SRAM_WRITE_FIFO w1_fifo(
   .rst(reset),
   .wr_clk(w1_clock),
@@ -139,6 +146,7 @@ SRAM_WRITE_FIFO w1_fifo(
   .valid(w1_valid),
   .dout(w1dout),
   .empty()); // unused?
+`endif
 
 
 // Instantiate the Read FIFOs here
@@ -179,6 +187,10 @@ SRAM_DATA_FIFO r1_data_fifo(
   .empty(),
   .prog_full());
 
+
+`ifdef MODELSIM
+  assign r0_read_valid = r0_din_valid;
+`else
 SRAM_ADDR_FIFO r0_addr_fifo(
   .rst(reset),
   .wr_clk(r0_clock),
@@ -191,7 +203,11 @@ SRAM_ADDR_FIFO r0_addr_fifo(
   .valid(r0_read_valid),
   .dout(r0_addr),
   .empty()); //unused?
+`endif
 
+`ifdef MODELSIM
+  assign r1_read_valid = r1_din_valid;
+`else
 SRAM_ADDR_FIFO r1_addr_fifo(
   .rst(reset),
   .wr_clk(r1_clock),
@@ -204,6 +220,7 @@ SRAM_ADDR_FIFO r1_addr_fifo(
   .valid(r1_read_valid),
   .dout(r1_addr),
   .empty()); //unused?
+`endif
 
 
 `ifdef MODELSIM // Output for testbench
