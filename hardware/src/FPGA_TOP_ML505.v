@@ -252,10 +252,10 @@ module FPGA_TOP_ML505(
       .w0_din(bg_dout),// {mask,addr,data}
 
       // W1: Overlay Writer
-      .w1_clock(1'b0),
-      .w1_din_ready(),
-      .w1_din_valid(),
-      .w1_din(),// {mask,addr,data}
+      .w1_clock(ol_clock),
+      .w1_din_ready(ol_ready),
+      .w1_din_valid(ol_valid),
+      .w1_din(ol_dout),// {mask,addr,data}
 
       // R0: Image Buffer Reader
       .r0_clock(dvi_clock),
@@ -298,7 +298,7 @@ module FPGA_TOP_ML505(
     //assign video = {8'h0, 8'h0, 8'hFF};
     //assign video_valid = 1'b1;
 
-    PatternGenerator pg(.reset(Reset), .clock(clk_50M), .VideoReady(video_ready), .VideoValid(video_valid), .Video(video));
+    //PatternGenerator pg(.reset(Reset), .clock(clk_50M), .VideoReady(video_ready), .VideoValid(video_valid), .Video(video));
 
     DVI #(
       .ClockFreq(                 DVIClockFreq),
