@@ -34,11 +34,11 @@ module SramArbiter(
 
   `define MODELSIM
   `ifdef MODELSIM // Output for testbench
-  output reg [2:0] state,
-  output wire r0_data_write_output,
-  output wire r1_data_write_output,
-  output wire r0_rd_en_output,
-  output wire r1_rd_en_output,
+  output reg [2:0] state;
+  output wire r0_data_write_output;
+  output wire r1_data_write_output;
+  output wire r0_rd_en_output;
+  output wire r1_rd_en_output;
   `endif
 
   // SRAM Interface
