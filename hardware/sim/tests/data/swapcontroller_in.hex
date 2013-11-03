@@ -1,0 +1,10 @@
+00 // transition Background Start, ~bg_start_ack
+08 // transition Background Start, bg_start_ack
+00 // transition Background Wait, ~bg_done
+02 // transition Background Wait, bg_done
+00 // transition Overlay Start, ~ol_start_ack
+04 // transition Overlay Start, ol_start_ack
+00 // transition Overlay Wait, ~ol_done
+01 // transition Overlay Wait, ol_done
+00 // transition Swap, ~swap_ack
+10 // transition Swap, swap_ack
