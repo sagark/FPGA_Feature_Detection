@@ -34,7 +34,7 @@ module SramArbiter(
 
   `define MODELSIM
   `ifdef MODELSIM // Output for testbench
-  output reg [2:0] state,
+  output wire [2:0] state,
   output wire r0_data_write_output,
   output wire r1_data_write_output,
   output wire r0_rd_en_output,
@@ -132,7 +132,7 @@ SRAM_WRITE_FIFO w0_fifo(
 `endif
 
 `ifdef MODELSIM
-  assign w1_valid = w0_din_valid; // Use input to directly change state
+  assign w1_valid = w1_din_valid; // Use input to directly change state
 `else
 SRAM_WRITE_FIFO w1_fifo(
   .rst(reset),
@@ -224,13 +224,7 @@ SRAM_ADDR_FIFO r1_addr_fifo(
 
 
 `ifdef MODELSIM // Output for testbench
-always @(*)
-  if (CurrentState == DOW0) state = 3'b00;
-  else if (CurrentState == DOW1) state = 3'b001;
-  else if (CurrentState == DOR0) state = 3'b010;
-  else if (CurrentState == DOR1) state = 3'b011;
-  else if (CurrentState == PAUSE) state = 3'b100;
-  else state = 3'b111;
+assign state = CurrentState;
 `endif
 
 
