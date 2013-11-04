@@ -290,8 +290,8 @@ module FPGA_TOP_ML505(
   `define DVI_ENABLE
   
   `ifdef DVI_ENABLE
-   wire [23:0] video;
-   wire video_ready,video_valid; 
+   //wire [23:0] video;
+   //wire video_ready,video_valid; 
 
     // REMOVE THESE WHEN TEST PATTERN GENERATOR IS DONE
 

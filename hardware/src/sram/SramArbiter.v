@@ -32,7 +32,7 @@ module SramArbiter(
   output        r1_dout_valid,
   output [31:0] r1_dout, // data
 
-  `define MODELSIM
+//  `define MODELSIM
   `ifdef MODELSIM // Output for testbench
   output wire [2:0] state,
   output wire r0_data_write_output,
