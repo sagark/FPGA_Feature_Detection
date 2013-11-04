@@ -21,11 +21,14 @@ module SramArbiterTestbench();
     //reg [2:0] arbiter_output_expected [num_tests-1:0];
 
     wire w0, w1, r0, r1;
-    reg w0_reg,w1_reg,r0_reg,r1_reg;
+    reg w0_reg,w1_reg,r0_reg,r1_reg, r0_prog_full_reg, r1_prog_full_reg;
+    wire sram_addr_valid, r0_data_write, r1_data_write, r0_read_en, r1_read_en, r0_prog_full, r1_prog_full;
     assign w0 = w0_reg;
     assign w1 = w1_reg;
     assign r0 = r0_reg;
     assign r1 = r1_reg;
+    assign r0_prog_full = r0_prog_full_reg;
+    assign r1_prog_full = r1_prog_full_reg;
     //wire [3:0] inputs;
     //wire [2:0] expected;
     wire [2:0] arbiter_output_actual;
@@ -76,13 +79,15 @@ module SramArbiterTestbench();
 	.r1_dout(), // Don't care about this output
 
 	.state(arbiter_output_actual),
-	.r0_data_write_output(), //INSERT OUTPUT HERE
-	.r1_data_write_output(), //INSERT OUTPUT HERE
-	.r0_rd_en_output(), //INSERT OUTPUT HERE
-	.r1_rd_en_output(), //INSERT OUTPUT HERE
+	.r0_data_write_output(r0_data_write),
+	.r1_data_write_output(r1_data_write),
+	.r0_rd_en_output(r0_read_en),
+	.r1_rd_en_output(r1_read_en),
+	.r0_prog_full(r0_prog_full),
+	.r1_prog_full(r1_prog_full),
 
 	.sram_clock(sram_clock),
-	.sram_addr_valid(), //INSERT OUTPUT HERE
+	.sram_addr_valid(sram_addr_valid),
 	.sram_ready(1),
 	.sram_addr(), // Don't care about this output
 	.sram_data_in(), // Don't care about this output
@@ -93,8 +98,10 @@ module SramArbiterTestbench();
     initial begin
 	i = 0;
 	fail = 0;
+	r0_prog_full_reg = 0;
+	r1_prog_full_reg = 0;
 	//$readmemh("arbiter_input.hex", arbiter_input);
-        //$readmemh("arbiter_out.hex", arbiter_output_expected);
+       //$readmemh("arbiter_out.hex", arbiter_output_expected);
 
         reset = 1;
 	#16 reset = 0;
@@ -149,7 +156,53 @@ module SramArbiterTestbench();
 			end
 		end
 	end
-			
+
+	/*w0_reg = 1;
+	w1_reg = 1;
+	r0_reg = 1;
+	r1_reg = 1;
+	r0_prog_full_reg = 1;
+	r1_prog_full_reg = 1;
+	$display("Begin tests with full read FIFOs");
+	for (i = 0; i < 64; i = i + 1) begin
+		#4;
+		if (r0_rd_en) begin
+			$display("FAIL%d: r0_rd_en = 1, arbiter attempted to read from read address FIFO", i);
+			fail = 1;
+		end
+		if (r1_rd_en) begin
+			$display("FAIL%d: r1_rd_en = 1, arbiter attempted to read from read address FIFO", i);
+			fail = 1;
+		end
+	end
+
+	w0_reg = 0;
+	w1_reg = 0;
+	r0_reg = 0;
+	r1_reg = 0;
+	r0_prog_full_reg = 0;
+	r1_prog_full_reg = 0;
+	$display("Begin tests with empty request FIFOs")
+	#4;
+	if (sram_addr_valid) begin
+		$display("FAIL0: sram_addr_valid = 1, arbiter attempted to submit a write");
+		fail = 1;
+	end
+	for (i = 1; i < 65; i = i + 1) begin
+		#4;
+		if (sram_addr_valid) begin
+			$display("FAIL%d: sram_addr_valid = 1, arbiter attempted to submit a write", i);
+			fail = 1;
+		end
+		if (r0_data_write) begin
+			$display("FAIL%d: r0_data_write = 1, arbiter attempted to write to r0", i);
+			fail = 1;
+		end
+		if (r1_data_write) begin
+			$display("FAIL%d: r1_data_write = 1, arbiter attempted to write to r1",i );
+			fail = 1;
+		end
+	end*/						
 
         /*for (i = 0; i < num_tests; i = i + 1) begin
 	    $display("Test %d: input: %b%b%b%b output: %d", i, w0,w1,r0,r1, arbiter_output_expected[i]);

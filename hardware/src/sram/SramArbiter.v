@@ -39,6 +39,8 @@ module SramArbiter(
   output wire r1_data_write_output,
   output wire r0_rd_en_output,
   output wire r1_rd_en_output,
+  input wire r0_prog_full,
+  input wire r1_prog_full,
   `endif
 
   // SRAM Interface
@@ -161,6 +163,11 @@ assign r1_din_ready = (!r1_data_full) & (!r1_addr_full); // TODO: backpressure
 assign r0_rd_en = (CurrentState == DOR0);
 assign r1_rd_en = (CurrentState == DOR1);
 
+`ifdef MODELSIM
+assign r0_dout = 0;
+assign r0_dout_valid = 1;
+//DO SOME ASSIGNMENTS FOR PROG_FULL HERE
+`else
 SRAM_DATA_FIFO r0_data_fifo(
   .rst(reset),
   .wr_clk(sram_clock),
@@ -174,7 +181,13 @@ SRAM_DATA_FIFO r0_data_fifo(
   .dout(r0_dout),
   .empty(),
   .prog_full());
+`endif
 
+`ifdef MODELSIM
+assign r1_dout = 0;
+assign r1_dout_valid = 1;
+//DO SOME ASSIGNMENTS FOR PROG_FULL HERE
+`else
 SRAM_DATA_FIFO r1_data_fifo(
   .rst(reset),
   .wr_clk(sram_clock),
@@ -188,6 +201,7 @@ SRAM_DATA_FIFO r1_data_fifo(
   .dout(r1_dout),
   .empty(),
   .prog_full());
+`endif
 
 
 `ifdef MODELSIM
