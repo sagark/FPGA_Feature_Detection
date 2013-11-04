@@ -32,7 +32,7 @@ module SramArbiter(
   output        r1_dout_valid,
   output [31:0] r1_dout, // data
 
-  `define MODELSIM
+  //`define MODELSIM
   `ifdef MODELSIM // Output for testbench
   output wire [2:0] state,
   output wire r0_data_write_output,
@@ -91,6 +91,8 @@ assign r1_data_write_output = r1_data_write;
 
 wire r0_data_full, r1_data_full; // FULL marker for READ ADDR FIFOs. should eventually be
                                  // unnecessary when "backpressure" implemented
+
+wire r0_addr_full, r1_addr_full;
 
 wire r0_read_valid, r1_read_valid; // whether or not there are pending read requests 
                                    // addresses waiting in READ ADDR FIFO
@@ -155,8 +157,8 @@ SRAM_WRITE_FIFO w1_fifo(
 assign r0_data_write = sram_data_out_valid & (!this0);
 assign r1_data_write = sram_data_out_valid & this0;
 
-assign r0_din_ready = !r0_data_full; // TODO: backpressure
-assign r1_din_ready = !r1_data_full; // TODO: backpressure
+assign r0_din_ready = (!r0_data_full) & (!r0_addr_full); // TODO: backpressure
+assign r1_din_ready = (!r1_data_full) & (!r1_addr_full); // TODO: backpressure
 
 assign r0_rd_en = (CurrentState == DOR0);
 assign r1_rd_en = (CurrentState == DOR1);
@@ -171,7 +173,7 @@ SRAM_DATA_FIFO r0_data_fifo(
   .wr_clk(sram_clock),
   .din(sram_data_out),
   .wr_en(r0_data_write),
-  .full(),
+  .full(r0_data_full),
 
   .rd_clk(r0_clock),
   .rd_en(r0_dout_ready),
@@ -191,7 +193,7 @@ SRAM_DATA_FIFO r1_data_fifo(
   .wr_clk(sram_clock),
   .din(sram_data_out),
   .wr_en(r1_data_write),
-  .full(),
+  .full(r1_data_full),
 
   .rd_clk(r1_clock),
   .rd_en(r1_dout_ready),
@@ -210,7 +212,7 @@ SRAM_ADDR_FIFO r0_addr_fifo(
   .wr_clk(r0_clock),
   .din(r0_din),
   .wr_en(r0_din_valid),
-  .full(r0_data_full),
+  .full(r0_addr_full),
 
   .rd_clk(sram_clock),
   .rd_en(r0_rd_en),
@@ -227,7 +229,7 @@ SRAM_ADDR_FIFO r1_addr_fifo(
   .wr_clk(r1_clock),
   .din(r1_din),
   .wr_en(r1_din_valid),
-  .full(r1_data_full),
+  .full(r1_addr_full),
 
   .rd_clk(sram_clock),
   .rd_en(r1_rd_en),
