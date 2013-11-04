@@ -216,7 +216,7 @@ SRAM_ADDR_FIFO r1_addr_fifo(
   .full(r1_data_full),
 
   .rd_clk(sram_clock),
-  .rd_en(r0_rd_en),
+  .rd_en(r1_rd_en),
   .valid(r1_read_valid),
   .dout(r1_addr),
   .empty()); //unused?
