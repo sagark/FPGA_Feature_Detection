@@ -21,7 +21,7 @@ module SramArbiterTestbench();
     //reg [2:0] arbiter_output_expected [num_tests-1:0];
 
     wire w0, w1, r0, r1;
-    reg w0_reg,w1_reg,r0_reg,r1_reg, r0_prog_full_reg, r1_prog_full_reg;
+    reg w0_reg,w1_reg,r0_reg,r1_reg, r0_prog_full_reg, r1_prog_full_reg, sram_dout_valid;
     wire sram_addr_valid, r0_data_write, r1_data_write, r0_read_en, r1_read_en, r0_prog_full, r1_prog_full;
     assign w0 = w0_reg;
     assign w1 = w1_reg;
@@ -93,7 +93,7 @@ module SramArbiterTestbench();
 	.sram_data_in(), // Don't care about this output
 	.sram_write_mask(), // Don't care about this output
 	.sram_data_out(0),
-	.sram_data_out_valid(1));
+	.sram_data_out_valid(sram_dout_valid));
 
     initial begin
 	i = 0;
@@ -111,6 +111,7 @@ module SramArbiterTestbench();
 	w1_reg = 1;
 	r0_reg = 1;
 	r1_reg = 1;
+	sram_dout_valid = 1;
 	for (i = 0; i < 2; i = i + 1) begin
 		for (j = 0; j < 4; j = j + 1) begin
 			#4;
@@ -182,6 +183,7 @@ module SramArbiterTestbench();
 	r1_reg = 0;
 	r0_prog_full_reg = 0;
 	r1_prog_full_reg = 0;
+	sram_dout_valid = 0;
 	$display("Begin tests with empty request FIFOs");
 	#4;
 	if (sram_addr_valid) begin
