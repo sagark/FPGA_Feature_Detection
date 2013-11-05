@@ -97,7 +97,7 @@ wire r0_addr_full, r1_addr_full;
 wire r0_read_valid, r1_read_valid; // whether or not there are pending read requests 
                                    // addresses waiting in READ ADDR FIFO
 
-wire r0_addr, r1_addr; // address value read from READ ADDR FIFO
+wire [17:0] r0_addr, r1_addr; // address value read from READ ADDR FIFO
 wire r0_rd_en, r1_rd_en; // enable reading from READ ADDR FIFO to issue read req in DOR0 or DOR1
 
 `ifdef MODELSIM

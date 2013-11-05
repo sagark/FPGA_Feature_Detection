@@ -1,18 +1,46 @@
+
+
+    Explore
+    Gist
+    Blog
+    Help
+
+    SaharMMesri
+    !
+
+You don't have any verified emails. We recommend verifying at least one email.
+
+Email verification helps our support team help you in case you have any email issues or lose your password.
+
+    9
+    0
+    0
+
+private EECS150 / fa13_team07
+
+fa13_team07 / hardware / src / sram / fifo / SRAM_DATA_FIFO.xco
+sagark an hour ago
+WOOOO BACKGROUND WORKS
+
+1 contributor
+file 214 lines (213 sloc) 7.138 kb
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 	
+
 ##############################################################
 #
 # Xilinx Core Generator version 14.6
-# Date: Tue Nov  5 06:14:01 2013
+# Date: Tue Nov 5 01:04:35 2013
 #
 ##############################################################
 #
-#  This file contains the customisation parameters for a
-#  Xilinx CORE Generator IP GUI. It is strongly recommended
-#  that you do not manually alter this file as it may cause
-#  unexpected and unsupported behavior.
+# This file contains the customisation parameters for a
+# Xilinx CORE Generator IP GUI. It is strongly recommended
+# that you do not manually alter this file as it may cause
+# unexpected and unsupported behavior.
 #
 ##############################################################
 #
-#  Generated from component: xilinx.com:ip:fifo_generator:9.3
+# Generated from component: xilinx.com:ip:fifo_generator:9.3
 #
 ##############################################################
 #
@@ -53,7 +81,7 @@ CSET clock_enable_type=Slave_Interface_Clock_Enable
 CSET clock_type_axi=Common_Clock
 CSET component_name=SRAM_DATA_FIFO
 CSET data_count=false
-CSET data_count_width=4
+CSET data_count_width=11
 CSET disable_timing_violations=true
 CSET disable_timing_violations_axi=false
 CSET dout_reset_value=0
@@ -111,14 +139,14 @@ CSET fifo_implementation_wach=Common_Clock_Block_RAM
 CSET fifo_implementation_wdch=Common_Clock_Block_RAM
 CSET fifo_implementation_wrch=Common_Clock_Block_RAM
 CSET full_flags_reset_value=1
-CSET full_threshold_assert_value=12
+CSET full_threshold_assert_value=2040
 CSET full_threshold_assert_value_axis=1023
 CSET full_threshold_assert_value_rach=1023
 CSET full_threshold_assert_value_rdch=1023
 CSET full_threshold_assert_value_wach=1023
 CSET full_threshold_assert_value_wdch=1023
 CSET full_threshold_assert_value_wrch=1023
-CSET full_threshold_negate_value=11
+CSET full_threshold_negate_value=2039
 CSET id_width=4
 CSET inject_dbit_error=false
 CSET inject_dbit_error_axis=false
@@ -135,7 +163,7 @@ CSET inject_sbit_error_wach=false
 CSET inject_sbit_error_wdch=false
 CSET inject_sbit_error_wrch=false
 CSET input_data_width=32
-CSET input_depth=16
+CSET input_depth=2048
 CSET input_depth_axis=1024
 CSET input_depth_rach=16
 CSET input_depth_rdch=1024
@@ -144,7 +172,7 @@ CSET input_depth_wdch=1024
 CSET input_depth_wrch=16
 CSET interface_type=Native
 CSET output_data_width=32
-CSET output_depth=16
+CSET output_depth=2048
 CSET overflow_flag=false
 CSET overflow_flag_axi=false
 CSET overflow_sense=Active_High
@@ -168,7 +196,7 @@ CSET rach_type=FIFO
 CSET rdch_type=FIFO
 CSET read_clock_frequency=1
 CSET read_data_count=false
-CSET read_data_count_width=4
+CSET read_data_count_width=11
 CSET register_slice_mode_axis=Fully_Registered
 CSET register_slice_mode_rach=Fully_Registered
 CSET register_slice_mode_rdch=Fully_Registered
@@ -203,11 +231,26 @@ CSET write_acknowledge_flag=false
 CSET write_acknowledge_sense=Active_High
 CSET write_clock_frequency=1
 CSET write_data_count=false
-CSET write_data_count_width=4
+CSET write_data_count_width=11
 CSET wuser_width=1
 # END Parameters
 # BEGIN Extra information
 MISC pkg_timestamp=2012-11-19T12:39:56Z
 # END Extra information
 GENERATE
-# CRC: 1721f53d
+# CRC: 71113243
+
+    Status
+    API
+    Training
+    Shop
+    Blog
+    About
+
+    © 2013 GitHub, Inc.
+    Terms
+    Privacy
+    Security
+    Contact
+
+
