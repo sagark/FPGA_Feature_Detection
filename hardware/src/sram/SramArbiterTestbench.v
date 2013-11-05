@@ -157,8 +157,8 @@ module SramArbiterTestbench();
 		end
 	end
 
-	/*w0_reg = 1;
-	w1_reg = 1;
+	w0_reg = 0;
+	w1_reg = 0;
 	r0_reg = 1;
 	r1_reg = 1;
 	r0_prog_full_reg = 1;
@@ -166,12 +166,12 @@ module SramArbiterTestbench();
 	$display("Begin tests with full read FIFOs");
 	for (i = 0; i < 64; i = i + 1) begin
 		#4;
-		if (r0_rd_en) begin
-			$display("FAIL%d: r0_rd_en = 1, arbiter attempted to read from read address FIFO", i);
+		if (r0_read_en) begin
+			$display("FAIL%d: r0_rd_en = 1, state = %d, arbiter attempted to read from read address FIFO", i, arbiter_output_actual);
 			fail = 1;
 		end
-		if (r1_rd_en) begin
-			$display("FAIL%d: r1_rd_en = 1, arbiter attempted to read from read address FIFO", i);
+		if (r1_read_en) begin
+			$display("FAIL%d: r1_rd_en = 1, state = %d, arbiter attempted to read from read address FIFO", i, arbiter_output_actual);
 			fail = 1;
 		end
 	end
@@ -182,7 +182,7 @@ module SramArbiterTestbench();
 	r1_reg = 0;
 	r0_prog_full_reg = 0;
 	r1_prog_full_reg = 0;
-	$display("Begin tests with empty request FIFOs")
+	$display("Begin tests with empty request FIFOs");
 	#4;
 	if (sram_addr_valid) begin
 		$display("FAIL0: sram_addr_valid = 1, arbiter attempted to submit a write");
@@ -191,18 +191,18 @@ module SramArbiterTestbench();
 	for (i = 1; i < 65; i = i + 1) begin
 		#4;
 		if (sram_addr_valid) begin
-			$display("FAIL%d: sram_addr_valid = 1, arbiter attempted to submit a write", i);
+			$display("FAIL%d: sram_addr_valid = 1, state = %d, arbiter attempted to submit a write", i, arbiter_output_actual);
 			fail = 1;
 		end
 		if (r0_data_write) begin
-			$display("FAIL%d: r0_data_write = 1, arbiter attempted to write to r0", i);
+			$display("FAIL%d: r0_data_write = 1, state = %d, arbiter attempted to write to r0", i, arbiter_output_actual);
 			fail = 1;
 		end
 		if (r1_data_write) begin
-			$display("FAIL%d: r1_data_write = 1, arbiter attempted to write to r1",i );
+			$display("FAIL%d: r1_data_write = 1, state = %d, arbiter attempted to write to r1", i, arbiter_output_actual);
 			fail = 1;
 		end
-	end*/						
+	end						
 
         /*for (i = 0; i < num_tests; i = i + 1) begin
 	    $display("Test %d: input: %b%b%b%b output: %d", i, w0,w1,r0,r1, arbiter_output_expected[i]);

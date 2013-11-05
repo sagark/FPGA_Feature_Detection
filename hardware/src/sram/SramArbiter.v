@@ -32,7 +32,7 @@ module SramArbiter(
   output        r1_dout_valid,
   output [31:0] r1_dout, // data
 
-  //`define MODELSIM
+  `define MODELSIM
   `ifdef MODELSIM // Output for testbench
   output wire [2:0] state,
   output wire r0_data_write_output,
@@ -166,7 +166,7 @@ assign r1_rd_en = (CurrentState == DOR1);
 `ifdef MODELSIM
 assign r0_dout = 0;
 assign r0_dout_valid = 1;
-//DO SOME ASSIGNMENTS FOR PROG_FULL HERE
+assign r0_data_full = r0_prog_full;
 `else
 SRAM_DATA_FIFO r0_data_fifo(
   .rst(reset),
@@ -186,7 +186,7 @@ SRAM_DATA_FIFO r0_data_fifo(
 `ifdef MODELSIM
 assign r1_dout = 0;
 assign r1_dout_valid = 1;
-//DO SOME ASSIGNMENTS FOR PROG_FULL HERE
+assign r1_data_full = r1_prog_full;
 `else
 SRAM_DATA_FIFO r1_data_fifo(
   .rst(reset),
@@ -266,21 +266,21 @@ always @(*) begin
             if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
             else if( r0_read_valid & (!r0_data_full) ) NextState = DOR0;
-            else if( r1_read_valid ) NextState = DOR1;
+            else if( r1_read_valid & (!r1_data_full)) NextState = DOR1;
             else NextState = PAUSE;
         end
 
         DOW0: begin
             if(w1_valid) NextState = DOW1;
             else if( r0_read_valid & (!r0_data_full)) NextState = DOR0;
-            else if( r1_read_valid ) NextState = DOR1;
+            else if( r1_read_valid & (!r1_data_full)) NextState = DOR1;
             else if(w0_valid) NextState = DOW0;
             else NextState = PAUSE;
         end
 
         DOW1: begin
             if( r0_read_valid & (!r0_data_full)) NextState = DOR0;
-            else if( r1_read_valid ) NextState = DOR1;
+            else if( r1_read_valid & (!r1_data_full)) NextState = DOR1;
             else if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
             else NextState = PAUSE;
@@ -288,7 +288,7 @@ always @(*) begin
 
         DOR0: begin
             next2 = 1'b0;
-            if( r1_read_valid ) NextState = DOR1;
+            if( r1_read_valid & (!r1_data_full)) NextState = DOR1;
             else if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
             else if( r0_read_valid & (!r0_data_full)) NextState = DOR0;
@@ -300,7 +300,7 @@ always @(*) begin
             if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
             else if( r0_read_valid & (!r0_data_full)) NextState = DOR0;
-            else if( r1_read_valid ) NextState = DOR1;
+            else if( r1_read_valid & (!r1_data_full)) NextState = DOR1;
             else NextState = PAUSE;
         end
 
