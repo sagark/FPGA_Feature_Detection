@@ -157,8 +157,8 @@ SRAM_WRITE_FIFO w1_fifo(
 assign r0_data_write = sram_data_out_valid & (!this0);
 assign r1_data_write = sram_data_out_valid & this0;
 
-assign r0_din_ready = (!r0_data_full) & (!r0_addr_full); // TODO: backpressure
-assign r1_din_ready = (!r1_data_full) & (!r1_addr_full); // TODO: backpressure
+assign r0_din_ready = (!r0_addr_full); // TODO: backpressure
+assign r1_din_ready = (!r1_addr_full); // TODO: backpressure
 
 assign r0_rd_en = (CurrentState == DOR0);
 assign r1_rd_en = (CurrentState == DOR1);
@@ -173,14 +173,14 @@ SRAM_DATA_FIFO r0_data_fifo(
   .wr_clk(sram_clock),
   .din(sram_data_out),
   .wr_en(r0_data_write),
-  .full(r0_data_full),
+  .full(),
 
   .rd_clk(r0_clock),
   .rd_en(r0_dout_ready),
   .valid(r0_dout_valid),
   .dout(r0_dout),
   .empty(),
-  .prog_full());
+  .prog_full(r0_data_full));
 `endif
 
 `ifdef MODELSIM
@@ -193,14 +193,14 @@ SRAM_DATA_FIFO r1_data_fifo(
   .wr_clk(sram_clock),
   .din(sram_data_out),
   .wr_en(r1_data_write),
-  .full(r1_data_full),
+  .full(),
 
   .rd_clk(r1_clock),
   .rd_en(r1_dout_ready),
   .valid(r1_dout_valid),
   .dout(r1_dout),
   .empty(),
-  .prog_full());
+  .prog_full(r1_data_full));
 `endif
 
 
@@ -265,21 +265,21 @@ always @(*) begin
         PAUSE: begin
             if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
-            else if( r0_read_valid ) NextState = DOR0;
+            else if( r0_read_valid & (!r0_data_full) ) NextState = DOR0;
             else if( r1_read_valid ) NextState = DOR1;
             else NextState = PAUSE;
         end
 
         DOW0: begin
             if(w1_valid) NextState = DOW1;
-            else if( r0_read_valid ) NextState = DOR0;
+            else if( r0_read_valid & (!r0_data_full)) NextState = DOR0;
             else if( r1_read_valid ) NextState = DOR1;
             else if(w0_valid) NextState = DOW0;
             else NextState = PAUSE;
         end
 
         DOW1: begin
-            if( r0_read_valid ) NextState = DOR0;
+            if( r0_read_valid & (!r0_data_full)) NextState = DOR0;
             else if( r1_read_valid ) NextState = DOR1;
             else if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
@@ -291,7 +291,7 @@ always @(*) begin
             if( r1_read_valid ) NextState = DOR1;
             else if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
-            else if( r0_read_valid ) NextState = DOR0;
+            else if( r0_read_valid & (!r0_data_full)) NextState = DOR0;
             else NextState = PAUSE;
         end
 
@@ -299,7 +299,7 @@ always @(*) begin
             next2 = 1'b1;
             if(w0_valid) NextState = DOW0;
             else if(w1_valid) NextState = DOW1;
-            else if( r0_read_valid ) NextState = DOR0;
+            else if( r0_read_valid & (!r0_data_full)) NextState = DOR0;
             else if( r1_read_valid ) NextState = DOR1;
             else NextState = PAUSE;
         end
