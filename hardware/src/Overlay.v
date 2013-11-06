@@ -22,7 +22,7 @@ module Overlay #(
 // Indicate the top left corner of the 16x16 window of the pattern
 localparam x_offset = 500;
 localparam y_offset = 250;
-localparam num_inputs = 64;
+localparam num_inputs = 59;
 
 // Components of dout
 reg frame;
@@ -47,7 +47,7 @@ reg started;
 reg [7:0] pixel_coordinates [num_inputs-1:0];
 wire [7:0] pixel_input;
 initial begin
-  $readmemh("overlay.hex", pixel_coordinates);
+  $readmemh("initials.hex", pixel_coordinates);
 end
 assign pixel_input = pixel_coordinates[input_count];
 assign x_orig = pixel_input[3:0];
