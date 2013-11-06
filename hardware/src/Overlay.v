@@ -1,4 +1,4 @@
-module Overlay #(
+module Overlay2 #(
   parameter N_PIXEL = 480000)
 (
   input clock,
@@ -16,39 +16,53 @@ module Overlay #(
   output valid,
   input ready);
 
-// This overlay will draw a 16x16 pixel + sign. Rows 7, 8, and columns
-// 7, 8 will be green. The location of this pixel is determined by
-// parameters LeftX and TopY. Those parameters describe the pixel in
-// the output image that correspond to (0,0) in the 16x16 overlay.
+// This overlay will draw a 16x16 green drawing over the image, by reading
+// out pixel coordinates from a hex file.
 
 // Indicate the top left corner of the 16x16 window of the pattern
-localparam LeftX = 500;
-localparam TopY = 250;
-localparam vertical_bar_x = LeftX + 7; // The x value where the vertical bar starts
-localparam horizontal_bar_y = TopY + 7; // The y value where the horizontal bar starts
+localparam x_offset = 500;
+localparam y_offset = 250;
+localparam num_inputs = 64;
 
 // Components of dout
 reg frame;
 wire [16:0] addr;
 reg [3:0] mask;
 
+// Inputs from file
+wire [3:0] x_orig;
+wire [3:0] y_orig;
+
+// Pixel location orig+offset
+wire [9:0] x;
+wire [9:0] y;
+assign x = x_offset + x_orig;
+assign y = y_offset + y_orig;
+
 // Counters and state variables
-reg [9:0] column;
-reg [9:0] row;
-reg horizontal_or_vertical; // 0 while drawing the horizontal bar
-			    // 1 while drawing the vertical bar
+reg [7:0] input_count;
 reg started;
+
+// Load pixel coordinates from hex file
+reg [7:0] pixel_coordinates [num_inputs-1:0];
+wire [7:0] pixel_input;
+initial begin
+  $readmemh("overlay.hex", pixel_coordinates);
+end
+assign pixel_input = pixel_coordinates[input_count];
+assign x_orig = pixel_input[3:0];
+assign y_orig = pixel_input[7:4];
 
 // Generate Green color for all pixels
 wire [31:0] pixel;
 assign pixel = 32'h02020202;
 
 // Calculate byte address based on row and column
-assign addr = row[9:2] + (200*column[9:0]);
+assign addr = x[9:2] + (200*y[9:0]);
 
 // Calculate write mask based on column
 always @(*)
-	case(row[1:0])
+	case(x[1:0])
 		2'b00: mask = 4'b0001;
 		2'b01: mask = 4'b0010;
 		2'b10: mask = 4'b0100;
@@ -65,41 +79,12 @@ assign valid = started;
 
 // Increment through row and column counter to make pattern
 always @(posedge clock)
-  if (reset) begin
-	row <= horizontal_bar_y;
-	column <= LeftX;
-	horizontal_or_vertical <= 1'b0;
-  end
-  else if (horizontal_or_vertical & inc) begin
-    if (column == (LeftX+15)) begin
-	if (row == (horizontal_bar_y + 1)) begin
-	  horizontal_or_vertical <= 1'b1;
-	  row <= TopY;
-	  column <= vertical_bar_x;
-	end
-	else begin
-	  row <= row + 1;
-	  column <= LeftX;
-	end
-    end
-	else
-	  column <= column + 1;
-  end
-  else if (inc) begin
-    if (column == (vertical_bar_x+1)) begin
-	if (row == (TopY+15)) begin
-	  horizontal_or_vertical <= 1'b0;
-	  row <= horizontal_bar_y;
-	  column <= LeftX;
-        end
-        else begin
-	  row <= row + 1;
-	  column <= vertical_bar_x;
-	end
-    end
-    else
-	column <= column + 1;
-  end
+  if (reset)
+    input_count <= 0;
+  else if (inc & (input_count == num_inputs-1))
+    input_count <= 0;
+  else if (inc)
+    input_count <= input_count + 1;
   
 always @(posedge clock)
   if (reset) begin
@@ -107,7 +92,7 @@ always @(posedge clock)
 	frame <= 1'b1;
   end
   else if (done & done_ack) done <= 1'b0;
-  else if (inc & (column == (vertical_bar_x+1)) & (row == (TopY+15))) begin
+  else if (inc & (input_count == num_inputs-1)) begin
 	done <= 1'b1;
 	frame <= ~frame;
   end
@@ -115,7 +100,7 @@ always @(posedge clock)
 always @(posedge clock)
   if (reset) started <= 1'b0;
   else if (start) started <= 1'b1;
-  else if (inc & (column == (vertical_bar_x+1)) & (row == (TopY+15))) started <= 1'b0;
+  else if (inc & (input_count == num_inputs-1)) started <= 1'b0;
 
 always @(posedge clock)
   if(reset) start_ack <= 1'b0;

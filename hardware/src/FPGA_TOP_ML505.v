@@ -175,7 +175,7 @@ module FPGA_TOP_ML505(
     wire [53:0] ol_dout;
     wire ol_valid,ol_ready;
 
-    Overlay #(
+    Overlay2 #(
       .N_PIXEL(N_PIXEL_2))
     over (
       .clock(ol_clock),
