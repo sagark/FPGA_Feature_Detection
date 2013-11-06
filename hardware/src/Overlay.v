@@ -1,4 +1,4 @@
-module Overlay2 #(
+module Overlay #(
   parameter N_PIXEL = 480000)
 (
   input clock,
