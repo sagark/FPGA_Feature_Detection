@@ -18,6 +18,8 @@
 
 \noindent\includegraphics[width=\textwidth]{modules/procoverall.png}
 
+\newpage
+
 \subsection*{a. Gaussian Filter Banks}
 
 Octave Module:
@@ -26,25 +28,40 @@ Delay blocks are 2112 byte wide shift registers.
 
 \noindent\includegraphics[width=\textwidth]{modules/prococtave.png}
 
+\newpage
+
 5x5 Window Module:
 
 Delay block is 2112 bit wide shift register.
 
 \noindent\includegraphics[width=\textwidth]{modules/proc5x5window.png}
 
+\newpage
 X Window Module:
+
+Data lines after multiplication blocks are all 16 bits wide, DOUT is cut
+back down to 8 bits.
 
 \noindent\includegraphics[width=\textwidth]{modules/procx_window.png}
 
+\newpage 
+
 Y Window Module:
 
+Data lines after multiplication blocks are all 16 bits wide, DOUT is cut
+back down to 8 bits.
+
 \noindent\includegraphics[width=\textwidth]{modules/procy_window.png}
+
+\newpage
 
 5 Row Array Module:
 
 Shift registers are 420 bytes wide.
 
 \noindent\includegraphics[width=\textwidth]{modules/proc5row.png}
+
+\newpage
 
 \subsection*{b. Downsampling}
 
@@ -61,6 +78,8 @@ Shift registers are 420 bytes wide.
 Upsample 2x:
 
 \noindent\includegraphics[width=\textwidth]{modules/procupsample2x.png}
+
+\newpage
 
 Upsample 4x:
 
@@ -227,6 +246,124 @@ while(true){
 
 \section*{4. Controller State Diagram}
 
+The pipeline does not have a single controller, rather the individual modules
+inside each contain their own controllers, whose states are maintained using
+counters (a row and column counter).
+
+
+
+
 \section*{5. Testbench Outline}
+Overall System:
+\begin{itemize}
+    \item Feed in 800x600 pixel image, simulating inputs from VGA controller, check that outputs are correct DoG.
+    \item Output correctness can be tested using existing python script.
+\end{itemize}
+
+Octave Module:
+\begin{itemize}
+    \item Feed in 5x5 window of data, confirm that 5 DoGs are computed correctly.
+    \item Potential failure modes:
+        \begin{itemize}
+            \item Delay length for alignment of DoG computation.
+            \item Reacting to deassertion of validIn.
+            \item Ensure correct valid signal propagation for display.
+        \end{itemize}
+\end{itemize}
+
+
+5x5 Window Module:
+\begin{itemize}
+    \item Feed in 5x5 window of data, confirm 2D convolution output.
+    \item Potential failure modes:
+        \begin{itemize}
+            \item Correct coefficient selection (FSM will go here).
+            \item Delay length for BlankingRegion.
+            \item Reacting to deassertion of validIn.
+            \item Ensure correct handling of BlankingRegion (should force input to zero in the region).
+        \end{itemize}
+\end{itemize}
+
+
+X Window Module:
+\begin{itemize}
+    \item Feed in row at a time of video signal and confirm horizontal convolution output.
+    \item Potential failure modes:
+        \begin{itemize}
+            \item Correct coefficient selection.
+        \end{itemize}
+\end{itemize}
+
+
+Y Window Module:
+\begin{itemize}
+    \item Feed in column at a time of video signal (columns that are 5 pixels tall) and confirm vertical convolution output.
+    \item Potential failure modes:
+        \begin{itemize}
+            \item Correct coefficient selection.
+        \end{itemize}
+\end{itemize}
+
+
+5 Row Array Module:
+\begin{itemize}
+    \item Feed in first 5 lines of 420x320 AND 210x160 signal, should recieve one ``column'' out per cycle, consisting of 5 elements. This should continue for 420 cycles for 420x320 and 210 cycles for 210x160.
+    \item Potential failure modes:
+        \begin{itemize}
+            \item Reacting to Valid going low (potential for incorrect values to enter shift registers?).
+        \end{itemize}
+\end{itemize}
+
+
+800x600 to 420x320 downsampler (2x + adds padding):
+\begin{itemize}
+    \item Feed in 800x600 signal, should recieve 420x320 signal out
+    \item Potential failure modes:
+        \begin{itemize}
+            \item Off by one errors in counter logic.
+            \item Reacting to Valid going low.
+            \item Case where pipeline consuming data much slower than VGA provides it (FIFO overflow).
+            \item Potential for errors in adding artifical blanking region.
+            \item Guaranteed failure if input VGA blanking period is not at least 40px in each direction.
+        \end{itemize}
+\end{itemize}
+
+
+420x320 to 210x160 downsampler (2x):
+\begin{itemize}
+    \item Feed in 420x320 signal, should recieve 210x160 signal out
+    \item Potential failure modes:
+        \begin{itemize}
+            \item Off by one errors in counter logic.
+            \item Reacting to Valid going low.
+            \item Case where pipeline consuming data much slower than VGA provides it (FIFO overflow).
+        \end{itemize}
+\end{itemize}
+
+
+Upsample 2x:
+\begin{itemize}
+    \item Feed in 420x320 signal, should recieve 800x400 signal out
+    \item Potential failure modes:
+        \begin{itemize}
+            \item Off by one errors in switching between ``live'' input and shift register values.
+            \item Reacting to Valid going low.
+            \item Case where clock 1 faster than clock 2 (FIFO overflow).
+        \end{itemize}
+\end{itemize}
+
+
+Upsample 4x:
+\begin{itemize}
+    \item Feed in 210x160 signal, should recieve 800x400 signal out
+    \item Potential failure modes:
+        \begin{itemize}
+            \item Off by one errors in switching between ``live'' input and shift register values.
+            \item Reacting to Valid going low.
+            \item Case where clock 1 faster than clock 2 (FIFO overflow).
+        \end{itemize}
+\end{itemize}
+
+Interface Connections
 
 \end{document}
