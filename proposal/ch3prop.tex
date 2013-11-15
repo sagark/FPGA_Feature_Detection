@@ -32,7 +32,7 @@ Delay blocks are 2112 byte wide shift registers.
 
 5x5 Window Module:
 
-Delay block is 2112 bit wide shift register.
+Delay block is a 2112 bit wide shift register or a 1062 bit wide shift register (corresponding to 420 pixels wide and 210 pixels wide respectively).
 
 \noindent\includegraphics[width=\textwidth]{modules/proc5x5window.png}
 
@@ -57,7 +57,7 @@ back down to 8 bits.
 
 5 Row Array Module:
 
-Shift registers are 420 bytes wide.
+Shift registers are 420 bytes wide or 210 bytes wide.
 
 \noindent\includegraphics[width=\textwidth]{modules/proc5row.png}
 
@@ -246,12 +246,26 @@ while(true){
 
 \section*{4. Controller State Diagram}
 
-The pipeline does not have a single controller, rather the individual modules
-inside each contain their own controllers, whose states are maintained using
-counters (a row and column counter).
+The pipeline does not have a single controller, rather each individual module
+inside contains its own controller, excluding the two controllers described below. 
+The controllers integrated into each module follow the following format:
 
+\begin{itemize}
+    \item[(1)] Remain in Idle until Valid is received.
+    \item[(2)] Begin iterating over pixels (number of pixels depends on frame size at that point in the computation), increasing the column counter values
+        by one for each valid pixel input and resetting the column counter and adding
+        one to the row counter at the end of a row. In the case where the pixel
+        input is not valid, the controller will remain in the last state.
+    \item[(3)] Upon completion return to idle (counters set to 0, 0), wait for next valid signal (in idle).
+\end{itemize}
 
+\subsection*{ASel controller for 5x5 Array}
 
+\noindent\includegraphics[width=\textwidth]{controllers/procasel.png}
+
+\subsection*{HSel controller for Y window}
+
+\noindent\includegraphics[width=\textwidth]{controllers/prochsel.png}
 
 \section*{5. Testbench Outline}
 Overall System:
@@ -260,7 +274,7 @@ Overall System:
     \item Output correctness can be tested using existing python script.
 \end{itemize}
 
-Octave Module:
+\noindent Octave Module:
 \begin{itemize}
     \item Feed in 5x5 window of data, confirm that 5 DoGs are computed correctly.
     \item Potential failure modes:
@@ -272,7 +286,7 @@ Octave Module:
 \end{itemize}
 
 
-5x5 Window Module:
+\noindent 5x5 Window Module:
 \begin{itemize}
     \item Feed in 5x5 window of data, confirm 2D convolution output.
     \item Potential failure modes:
@@ -285,7 +299,7 @@ Octave Module:
 \end{itemize}
 
 
-X Window Module:
+\noindent X Window Module:
 \begin{itemize}
     \item Feed in row at a time of video signal and confirm horizontal convolution output.
     \item Potential failure modes:
@@ -295,7 +309,7 @@ X Window Module:
 \end{itemize}
 
 
-Y Window Module:
+\noindent Y Window Module:
 \begin{itemize}
     \item Feed in column at a time of video signal (columns that are 5 pixels tall) and confirm vertical convolution output.
     \item Potential failure modes:
@@ -305,9 +319,9 @@ Y Window Module:
 \end{itemize}
 
 
-5 Row Array Module:
+\noindent 5 Row Array Module:
 \begin{itemize}
-    \item Feed in first 5 lines of 420x320 AND 210x160 signal, should recieve one ``column'' out per cycle, consisting of 5 elements. This should continue for 420 cycles for 420x320 and 210 cycles for 210x160.
+    \item Feed in first 5 lines of 420x320 AND 210x160 signal, should receive one ``column'' out per cycle, consisting of 5 elements. This should continue for 420 cycles for 420x320 and 210 cycles for 210x160.
     \item Potential failure modes:
         \begin{itemize}
             \item Reacting to Valid going low (potential for incorrect values to enter shift registers?).
@@ -315,55 +329,57 @@ Y Window Module:
 \end{itemize}
 
 
-800x600 to 420x320 downsampler (2x + adds padding):
+\noindent 800x600 to 420x320 downsampler (2x + adds padding):
 \begin{itemize}
-    \item Feed in 800x600 signal, should recieve 420x320 signal out
+    \item Feed in 800x600 signal, should receive 420x320 signal out
     \item Potential failure modes:
         \begin{itemize}
             \item Off by one errors in counter logic.
             \item Reacting to Valid going low.
             \item Case where pipeline consuming data much slower than VGA provides it (FIFO overflow).
-            \item Potential for errors in adding artifical blanking region.
+            \item FIFO delay handling.
+            \item Potential for errors in adding artificial blanking region.
             \item Guaranteed failure if input VGA blanking period is not at least 40px in each direction.
         \end{itemize}
 \end{itemize}
 
 
-420x320 to 210x160 downsampler (2x):
+\noindent 420x320 to 210x160 downsampler (2x):
 \begin{itemize}
-    \item Feed in 420x320 signal, should recieve 210x160 signal out
+    \item Feed in 420x320 signal, should receive 210x160 signal out
     \item Potential failure modes:
         \begin{itemize}
             \item Off by one errors in counter logic.
             \item Reacting to Valid going low.
+            \item FIFO delay handling.
             \item Case where pipeline consuming data much slower than VGA provides it (FIFO overflow).
         \end{itemize}
 \end{itemize}
 
 
-Upsample 2x:
+\noindent Upsample 2x:
 \begin{itemize}
-    \item Feed in 420x320 signal, should recieve 800x400 signal out
+    \item Feed in 420x320 signal, should receive 800x400 signal out
     \item Potential failure modes:
         \begin{itemize}
             \item Off by one errors in switching between ``live'' input and shift register values.
             \item Reacting to Valid going low.
             \item Case where clock 1 faster than clock 2 (FIFO overflow).
+            \item FIFO delay handling.
         \end{itemize}
 \end{itemize}
 
 
-Upsample 4x:
+\noindent Upsample 4x:
 \begin{itemize}
-    \item Feed in 210x160 signal, should recieve 800x400 signal out
+    \item Feed in 210x160 signal, should receive 800x400 signal out
     \item Potential failure modes:
         \begin{itemize}
             \item Off by one errors in switching between ``live'' input and shift register values.
             \item Reacting to Valid going low.
             \item Case where clock 1 faster than clock 2 (FIFO overflow).
+            \item FIFO delay handling.
         \end{itemize}
 \end{itemize}
-
-Interface Connections
 
 \end{document}
