@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.6
-# Date: Wed Nov 20 22:22:18 2013
+# Date: Wed Nov 20 23:16:22 2013
 #
 ##############################################################
 #
@@ -51,10 +51,10 @@ CSET meminitfile=no_coe_file_loaded
 CSET optgoal=Resources
 CSET readmiffile=false
 CSET reglastbit=true
-CSET sclr=false
+CSET sclr=true
 CSET shiftregtype=Fixed_Length
 CSET sinit=false
-CSET sset=true
+CSET sset=false
 CSET syncctrlpriority=Reset_Overrides_Set
 CSET syncinitradix=2
 CSET syncinitval=0
@@ -64,4 +64,4 @@ CSET width=1
 MISC pkg_timestamp=2012-11-05T14:22:31Z
 # END Extra information
 GENERATE
-# CRC: 6d134e83
+# CRC: 1e1ed29d
