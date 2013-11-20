@@ -124,8 +124,20 @@ module FPGA_TOP_ML505(
   wire dvi_swap, dvi_swap_ack;
   wire bg_start, bg_start_ack;
   wire bg_done, bg_done_ack;
-  wire ol_start, ol_start_ack;
-  wire ol_done, ol_done_ack;
+  
+  // Simple status monitor to count frame swaps
+  reg [7:0] swap_count;
+  reg dvi_swap_r;
+  always @(posedge clk_10M) begin
+    if(reset) begin
+      swap_count <= 8'd0;
+      dvi_swap_r <= 1'b0;
+    end else begin
+      dvi_swap_r <= dvi_swap;
+      if(dvi_swap & ~dvi_swap_r)
+        swap_count <= swap_count + 8'd1;
+    end
+  end
 
   SwapController sc(
     .clock(clk_10M),
@@ -135,14 +147,10 @@ module FPGA_TOP_ML505(
     .bg_start(bg_start),
     .bg_start_ack(bg_start_ack),
     .bg_done(bg_done),
-    .bg_done_ack(bg_done_ack),
-    .ol_start(ol_start),
-    .ol_start_ack(ol_start_ack),
-    .ol_done(ol_done),
-    .ol_done_ack(ol_done_ack));
+    .bg_done_ack(bg_done_ack));
 
   // -- |VGA Capture| ----------------------------------------------------------
-  `define VGA_ENABLE
+  //`define VGA_ENABLE
 
   wire vga_clock;
   wire vga_start, vga_start_ack;
@@ -154,7 +162,7 @@ module FPGA_TOP_ML505(
     VGA vga (
       .reset(reset),
       .clock(vga_clock),
-      .start(vga_start),
+      .start(vga_start & GPIO_DIP[1] & ~GPIO_DIP[0]),
       .start_ack(vga_start_ack),
       .done(vga_done),
       .done_ack(vga_done_ack),
@@ -168,6 +176,36 @@ module FPGA_TOP_ML505(
       .vga_hsout(VGA_HSOUT),
       .vga_vsout(VGA_VSOUT));
   `endif
+  
+  // -- |Static Image| ---------------------------------------------------------
+  `define STATIC_IMAGE_ENABLE
+
+  wire stc_img_clock;
+  wire stc_img_enable;
+  assign stc_img_enable = GPIO_DIP[1] & GPIO_DIP[0];
+
+  wire stc_img_start_ack;
+  wire stc_img_valid;
+  wire [7:0] stc_img_video;
+
+  `ifdef VGA_ENABLE
+    assign stc_img_clock = vga_clock;
+  `else
+    assign stc_img_clock = clk_10M;
+  `endif
+
+  `ifdef STATIC_IMAGE_ENABLE
+    StaticImage stc_img(
+      .clock(stc_img_clock),
+      .reset(reset),
+
+      .start(vga_start & stc_img_enable),
+      .start_ack(stc_img_start_ack),
+
+      .ready(1'b1),
+      .valid(stc_img_valid),
+      .pixel(stc_img_video));
+  `endif
 
   // -- |Image Buffer Writer| --------------------------------------------------
   `define IMAGE_WRITER_ENABLE
@@ -176,11 +214,19 @@ module FPGA_TOP_ML505(
     localparam N_PIXEL = 480000;
 
     wire bg_clock;
+    wire bg_vga_start_ack,bg_vga_video_valid;
+    wire [7:0] bg_vga_video;
 
   `ifdef VGA_ENABLE
     assign bg_clock = vga_clock;
+    assign bg_vga_start_ack = GPIO_DIP[0] ? stc_img_start_ack : vga_start_ack;
+    assign bg_vga_video = GPIO_DIP[0] ? stc_img_video : vga_video;
+    assign bg_vga_video_valid = GPIO_DIP[0] ? stc_img_valid : vga_video_valid;
   `else
     assign bg_clock = clk_10M;
+    assign bg_vga_start_ack = stc_img_start_ack;
+    assign bg_vga_video = stc_img_video;
+    assign bg_vga_video_valid = stc_img_valid ;
   `endif
 
     wire [53:0] bg_dout;
@@ -203,39 +249,11 @@ module FPGA_TOP_ML505(
       .ready(bg_ready),
 
       .vga_start(vga_start),
-      .vga_start_ack(vga_start_ack),
-      .vga_video(vga_video),
-      .vga_video_valid(vga_video_valid));
+      .vga_start_ack(bg_vga_start_ack),
+      .vga_video(bg_vga_video),
+      .vga_video_valid(bg_vga_video_valid));
 
   `endif // IMAGE_WRITER_ENABLE
-
-  // -- |Overlay| --------------------------------------------------
-  `define OVERLAY_ENABLE
-  
-  `ifdef OVERLAY_ENABLE
-    localparam N_PIXEL_2 = 480000;
-
-    wire ol_clock;
-    assign ol_clock = clk_10M;
-
-    wire [53:0] ol_dout;
-    wire ol_valid,ol_ready;
-
-    Overlay #(
-      .N_PIXEL(N_PIXEL_2))
-    over (
-      .clock(ol_clock),
-      .reset(reset),
-      .scroll(GPIO_DIP[0]),
-      .start(ol_start),
-      .start_ack(ol_start_ack),
-      .done(ol_done),
-      .done_ack(ol_done_ack),
-      .dout(ol_dout),
-      .valid(ol_valid),
-      .ready(ol_ready));
-
-  `endif // OVERLAY_ENABLE
 
   // -- |Image Buffer Reader| --------------------------------------------------
   `define IMAGE_READER_ENABLE
@@ -281,7 +299,7 @@ module FPGA_TOP_ML505(
     // SRAM controller wires
     wire sram_clock;
     assign sram_clock = clk_50M;
-
+    
     wire sram_addr_valid,sram_ready,sram_data_out_valid;
     wire [17:0] sram_addr;
     wire [31:0] sram_data_in,sram_data_out;
@@ -336,16 +354,6 @@ module FPGA_TOP_ML505(
   `define DVI_ENABLE
   
   `ifdef DVI_ENABLE
-   //wire [23:0] video;
-   //wire video_ready,video_valid; 
-
-    // REMOVE THESE WHEN TEST PATTERN GENERATOR IS DONE
-
-    //assign video = {8'h0, 8'h0, 8'hFF};
-    //assign video_valid = 1'b1;
-
-    //PatternGenerator pg(.reset(Reset), .clock(clk_50M), .VideoReady(video_ready), .VideoValid(video_valid), .Video(video));
-
     DVI #(
       .ClockFreq(                 DVIClockFreq),
       .Width(                     1040),
@@ -421,5 +429,5 @@ module FPGA_TOP_ML505(
     assign SRAM_D=32'dz;
   `endif // SRAM_ENABLE
 
-  assign GPIO_LED = {~reset, GPIO_SW_C, pll_lock, 5'b0};
+  assign GPIO_LED = {~reset, GPIO_SW_C, pll_lock, swap_count[4], 4'b0};
 endmodule
