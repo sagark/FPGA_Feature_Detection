@@ -1,12 +1,11 @@
 module y_window #(
-	parameter h0 = 6;
-	parameter h1 = 58;
-	parameter h2 = 128;
+	parameter h0 = 6,
+	parameter h1 = 58,
+	parameter h2 = 128
 )(
-	
 	input reset,
-	input clock
-	input [2:0] hsel;
+	input clock,
+	input [2:0] hsel,
 	input [7:0] din0,
 	input [7:0] din1,
 	input [7:0] din2,
@@ -43,11 +42,11 @@ module y_window #(
 			OUT <= 0;
 		end
 		else if (validin) begin
-			B0 <= din * coeff0;
-			B1 <= din * coeff1;
-			B2 <= din * coeff2;
-			B3 <= din * coeff3;
-			B4 <= din * coeff4;
+			B0 <= din0 * coeff0;
+			B1 <= din1 * coeff1;
+			B2 <= din2 * coeff2;
+			B3 <= din3 * coeff3;
+			B4 <= din4 * coeff4;
 			C0 <= B0 + B1;
 			C1 <= B2 + B3;
 			C2 <= B4;

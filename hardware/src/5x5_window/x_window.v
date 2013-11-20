@@ -1,9 +1,8 @@
 module x_window #(
-	parameter h0 = 6;
-	parameter h1 = 58;
-	parameter h2 = 128;
+	parameter h0 = 6,
+	parameter h1 = 58,
+	parameter h2 = 128
 )(
-
 	input reset,
 	input clock,
 	input [7:0] din,
@@ -12,7 +11,7 @@ module x_window #(
 	output validout);
 
 	reg [7:0] A0, B0, OUT;
-	reg [14:0] A2, A2, A3, B1, B2, B3, C1, C2, C3, C4, C6;
+	reg [14:0] A1, A2, A3, B1, B2, B3, C1, C2, C3, C4, C5;
 	reg [15:0] B4, C6;
 	reg [16:0] B5;
 	reg [17:0] A4;

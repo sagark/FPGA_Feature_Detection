@@ -1,0 +1,67 @@
+##############################################################
+#
+# Xilinx Core Generator version 14.6
+# Date: Wed Nov 20 22:22:18 2013
+#
+##############################################################
+#
+#  This file contains the customisation parameters for a
+#  Xilinx CORE Generator IP GUI. It is strongly recommended
+#  that you do not manually alter this file as it may cause
+#  unexpected and unsupported behavior.
+#
+##############################################################
+#
+#  Generated from component: xilinx.com:ip:c_shift_ram:11.0
+#
+##############################################################
+#
+# BEGIN Project Options
+SET addpads = false
+SET asysymbol = true
+SET busformat = BusFormatSquareBracketNotRipped
+SET createndf = false
+SET designentry = Verilog
+SET device = xc5vlx110t
+SET devicefamily = virtex5
+SET flowvendor = Other
+SET formalverification = false
+SET foundationsym = false
+SET implementationfiletype = Ngc
+SET package = ff1136
+SET removerpms = false
+SET simulationfiles = Behavioral
+SET speedgrade = -1
+SET verilogsim = true
+SET vhdlsim = false
+# END Project Options
+# BEGIN Select
+SELECT RAM-based_Shift_Register xilinx.com:ip:c_shift_ram:11.0
+# END Select
+# BEGIN Parameters
+CSET asyncinitradix=2
+CSET asyncinitval=0
+CSET ce=true
+CSET cepriority=Sync_Overrides_CE
+CSET component_name=delay_1088
+CSET defaultdata=0
+CSET defaultdataradix=2
+CSET depth=1088
+CSET meminitfile=no_coe_file_loaded
+CSET optgoal=Resources
+CSET readmiffile=false
+CSET reglastbit=true
+CSET sclr=false
+CSET shiftregtype=Fixed_Length
+CSET sinit=false
+CSET sset=true
+CSET syncctrlpriority=Reset_Overrides_Set
+CSET syncinitradix=2
+CSET syncinitval=0
+CSET width=1
+# END Parameters
+# BEGIN Extra information
+MISC pkg_timestamp=2012-11-05T14:22:31Z
+# END Extra information
+GENERATE
+# CRC: 6d134e83
