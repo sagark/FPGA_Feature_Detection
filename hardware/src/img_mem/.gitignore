@@ -4,5 +4,4 @@
 !*.xco
 !*.cgp
 !*.cgc
-!*.py
-!*.jpg
+!./src/*

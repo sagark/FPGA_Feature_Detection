@@ -124,6 +124,20 @@ module FPGA_TOP_ML505(
   wire dvi_swap, dvi_swap_ack;
   wire bg_start, bg_start_ack;
   wire bg_done, bg_done_ack;
+  
+  // Simple status monitor to count frame swaps
+  reg [7:0] swap_count;
+  reg dvi_swap_r;
+  always @(posedge clk_10M) begin
+    if(reset) begin
+      swap_count <= 8'd0;
+      dvi_swap_r <= 1'b0;
+    end else begin
+      dvi_swap_r <= dvi_swap;
+      if(dvi_swap & ~dvi_swap_r)
+        swap_count <= swap_count + 8'd1;
+    end
+  end
 
   SwapController sc(
     .clock(clk_10M),
@@ -136,7 +150,7 @@ module FPGA_TOP_ML505(
     .bg_done_ack(bg_done_ack));
 
   // -- |VGA Capture| ----------------------------------------------------------
-  `define VGA_ENABLE
+  //`define VGA_ENABLE
 
   wire vga_clock;
   wire vga_start, vga_start_ack;
@@ -166,6 +180,7 @@ module FPGA_TOP_ML505(
   // -- |Static Image| ---------------------------------------------------------
   `define STATIC_IMAGE_ENABLE
 
+  wire stc_img_clock;
   wire stc_img_enable;
   assign stc_img_enable = GPIO_DIP[1] & GPIO_DIP[0];
 
@@ -173,9 +188,15 @@ module FPGA_TOP_ML505(
   wire stc_img_valid;
   wire [7:0] stc_img_video;
 
+  `ifdef VGA_ENABLE
+    assign stc_img_clock = vga_clock;
+  `else
+    assign stc_img_clock = clk_10M;
+  `endif
+
   `ifdef STATIC_IMAGE_ENABLE
     StaticImage stc_img(
-      .clock(vga_clock),
+      .clock(stc_img_clock),
       .reset(reset),
 
       .start(vga_start & stc_img_enable),
@@ -193,11 +214,19 @@ module FPGA_TOP_ML505(
     localparam N_PIXEL = 480000;
 
     wire bg_clock;
+    wire bg_vga_start_ack,bg_vga_video_valid;
+    wire [7:0] bg_vga_video;
 
   `ifdef VGA_ENABLE
     assign bg_clock = vga_clock;
+    assign bg_vga_start_ack = GPIO_DIP[0] ? stc_img_start_ack : vga_start_ack;
+    assign bg_vga_video = GPIO_DIP[0] ? stc_img_video : vga_video;
+    assign bg_vga_video_valid = GPIO_DIP[0] ? stc_img_valid : vga_video_valid;
   `else
     assign bg_clock = clk_10M;
+    assign bg_vga_start_ack = stc_img_start_ack;
+    assign bg_vga_video = stc_img_video;
+    assign bg_vga_video_valid = stc_img_valid ;
   `endif
 
     wire [53:0] bg_dout;
@@ -220,9 +249,9 @@ module FPGA_TOP_ML505(
       .ready(bg_ready),
 
       .vga_start(vga_start),
-      .vga_start_ack(GPIO_DIP[0] ? stc_img_start_ack : vga_start_ack),
-      .vga_video(GPIO_DIP[0] ? stc_img_video : vga_video),
-      .vga_video_valid(GPIO_DIP[0] ? stc_img_valid : vga_video_valid));
+      .vga_start_ack(bg_vga_start_ack),
+      .vga_video(bg_vga_video),
+      .vga_video_valid(bg_vga_video_valid));
 
   `endif // IMAGE_WRITER_ENABLE
 
@@ -400,5 +429,5 @@ module FPGA_TOP_ML505(
     assign SRAM_D=32'dz;
   `endif // SRAM_ENABLE
 
-  assign GPIO_LED = {~reset, GPIO_SW_C, pll_lock, 5'b0};
+  assign GPIO_LED = {~reset, GPIO_SW_C, pll_lock, swap_count[4], 4'b0};
 endmodule
