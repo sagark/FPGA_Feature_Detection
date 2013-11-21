@@ -56,6 +56,7 @@ module five_by_five_window #(
 		.validout(yvalidout),
 		.dout(yout));
 
+	`define large_window
 	`ifdef large_window
 	wire intermediate;
 	delay_1088 delay0 (.clk(clock), .sclr(reset), .ce(validin), .d(blanking_in), .q(intermediate));
@@ -68,6 +69,7 @@ module five_by_five_window #(
 	assign xvalidin = validin;
 	assign ain = xout;
 	assign avalidin = xvalidout;
+	assign yvalidin = avalidout;
 	assign yin0 = aout0;
 	assign yin1 = aout1;
 	assign yin2 = aout2;
@@ -76,6 +78,7 @@ module five_by_five_window #(
 	assign dout = yout;
 	assign asel_wire = asel;
 	assign hsel_wire = hsel;
+	assign validout = yvalidout;
 
 	always @(posedge clock)
 		if (reset) x_count <= 0;
@@ -83,7 +86,7 @@ module five_by_five_window #(
 		else if (validin) x_count <= x_count + 1;
 
 	always @(posedge clock)
-		if (reset) asel <= 5'b00001;
+		if (reset) asel <= 5'b00100;
 		else if (validin & (x_count == width - 1))
 			case (asel)
 				5'b00001: asel <= 5'b00010;

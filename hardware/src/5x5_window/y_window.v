@@ -22,7 +22,6 @@ module y_window #(
 	reg [17:0] C5;
 	reg [2:0] valid_count;
 
-	wire [18:0] operand0, operand1, divide_result;
 	wire [7:0] divide_result_8;
 	reg [7:0] coeff0, coeff1, coeff2, coeff3, coeff4;
 
@@ -53,7 +52,7 @@ module y_window #(
 			C3 <= C0 + C1;
 			C4 <= C2;
 			C5 <= C3 + C4;
-			OUT <= divide_result;
+			OUT <= divide_result_8;
 		end
 
 	always @(*)
@@ -102,10 +101,7 @@ module y_window #(
 			end
 		endcase
 
-	assign operand0 = { C5, 1'b0 };
-	assign operand1 = { 1'b0, C5 };
-	assign divide_result = operand0 + operand1;
-	assign divide_result_8 = divide_result[18:11];
+	assign divide_result_8 = C5[17:10];
 
 	assign validout = validin & (valid_count == 3'd5);
 
