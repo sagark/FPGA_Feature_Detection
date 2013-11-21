@@ -101,7 +101,7 @@ module y_window #(
 			end
 		endcase
 
-	assign divide_result_8 = C5[17:10];
+	assign divide_result_8 = C5[15:8];
 
 	assign validout = validin & (valid_count == 3'd5);
 

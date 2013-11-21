@@ -54,7 +54,7 @@ module five_by_five_testbench ();
 
 		#40
 		valid_in = 1;
-		for (i = 0; i < delay; i = i + 1) begin
+		for (i = 0; i < delay-1; i = i + 1) begin
 			if ((i > 0) & (i % 400 == 0)) blanking_in = 1;
 			else if ((i > 1) & ((i-1) % 400 == 0)) blanking_in = 1;
 			else blanking_in = 0;
@@ -64,7 +64,7 @@ module five_by_five_testbench ();
 			end
 			#10;
 		end
-		i = delay - 1;
+		i = delay - 2;
 		for (j = 0; j < num_tests; j = j + 1) begin
 			i = i + 1;
 			if ((i > 0) & (i % 400 == 0)) blanking_in = 1;

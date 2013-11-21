@@ -10,55 +10,7 @@ module x_window #(
 	output [7:0] dout,
 	output validout);
 
-	reg [7:0] OUT;
-	reg [7:0] A1, A2, A3, A4;
-	reg [14:0] B0, B1, B2, B3, B4, C2, C4;
-	reg [15:0] C0, C1;
-	reg [16:0] C3;
-	reg [17:0] C5;
-	reg [2:0] valid_count;
-
-	wire [7:0] divide_result_8;
-
-	always @(posedge clock)
-		if (reset) begin
-			A1 <= 0;
-			A2 <= 0;
-			A3 <= 0;
-			A4 <= 0;
-			B0 <= 0;
-			B1 <= 0;
-			B2 <= 0;
-			B3 <= 0;
-			B4 <= 0;
-			C0 <= 0;
-			C1 <= 0;
-			C2 <= 0;
-			C3 <= 0;
-			C4 <= 0;
-			C5 <= 0;
-			OUT <= 0;
-		end
-		else if (validin) begin
-			A1 = din;
-			A2 = A1;
-			A3 = A2;
-			A4 = A3;
-			B0 <= din * h0;
-			B1 <= A1 * h1;
-			B2 <= A2 * h2;
-			B3 <= A3 * h1;
-			B4 <= A4 * h0;
-			C0 <= B0 + B1;
-			C1 <= B2 + B3;
-			C2 <= B4;
-			C3 <= C0 + C1;
-			C4 <= C2;
-			C5 <= C3 + C4;
-			OUT <= divide_result_8;
-		end
-
-	/*reg [7:0] A0, B0, OUT;
+	reg [7:0] A0, B0, OUT;
 	reg [14:0] A1, A2, A3, B1, B2, B3, C1, C2, C3, C4, C5;
 	reg [15:0] B4, C6;
 	reg [16:0] B5;
@@ -108,8 +60,8 @@ module x_window #(
 			C6 <= C1 + C5;
 			OUT <= divide_result_8;
 		end
-*/
-	assign divide_result_8 = A4[17:10];
+
+	assign divide_result_8 = A4[15:8];
 
 	assign validout = validin & (valid_count == 3'd7);
 
