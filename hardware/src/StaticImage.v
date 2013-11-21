@@ -48,7 +48,7 @@ always @(posedge clock) begin
     img_col <= OUT_WIDTH;
     img_pxl <= 15'd0;
     start_ack <= 1'b0;
-    start_ack <= 1'b0;
+    start_ack_r <= 1'b0;
   end else begin
     start_ack <= start;
     start_ack_r <= start_ack;
