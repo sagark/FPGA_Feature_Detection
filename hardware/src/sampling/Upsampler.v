@@ -7,6 +7,9 @@ module Upsampler(
     input valid,
     input [7:0] data,
 
+    output [9:0] current_rowcount,
+    output [9:0] current_colcount,
+
     output fifo_read,
     output [7:0] dataout,
     output reg validout
@@ -42,6 +45,8 @@ assign shift_reg_in = data_int;
 assign dataout = delay_mod1 ? shift_reg_out : data_int;
 assign valid_out_in = (rowcount < 600) && (colcount < 800) && ( ord_valid | (rowcount % 2 == 1));
 assign delay_mod1_in = (rowcount % 2 == 1);
+assign current_rowcount = rowcount;
+assign current_colcount = colcount;
 
 shift_ram SR(
     .clk(clock),
@@ -61,6 +66,7 @@ always @(posedge clock) begin
     end else begin
         valid_r <= valid;
         colcount <= next_col;
+        rowcount <= next_row;
         validout <= valid_out_in;
         delay_mod1 <= delay_mod1_in;
         data_int <= next_data;
