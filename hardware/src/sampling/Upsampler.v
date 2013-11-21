@@ -33,7 +33,7 @@ wire enable_sig;
 wire [7:0] next_data;
 
 reg delay_mod1;
-reg sr_out_r; 
+reg [7:0] sr_out_r; 
 
 shift_ram SR(
     .clk(clock),

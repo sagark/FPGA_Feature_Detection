@@ -232,6 +232,9 @@ module FPGA_TOP_ML505(
     wire [53:0] bg_dout;
     wire bg_valid,bg_ready;
 
+    wire [7:0] new_vga_video;
+    wire new_vga_valid;
+
     ImageBufferWriter #(
       .N_PIXEL(N_PIXEL))
     ibw (
@@ -249,11 +252,25 @@ module FPGA_TOP_ML505(
       .ready(bg_ready),
 
       .vga_start(vga_start),
-      .vga_start_ack(bg_vga_start_ack),
-      .vga_video(bg_vga_video),
-      .vga_video_valid(bg_vga_video_valid));
+      .vga_start_ack(stc_img_start_ack),
+      .vga_video(new_vga_video),
+      .vga_video_valid(new_vga_valid));
 
   `endif // IMAGE_WRITER_ENABLE
+
+
+    Check4 ch(
+        .clock1(bg_clock),
+        .clock2(bg_clock),
+        .clock3(bg_clock),
+        .reset(reset),
+
+        .din(stc_img_video),
+        .valid(stc_img_valid),
+
+        .dout(new_vga_video),
+        .validout(new_vga_valid)
+    );
 
   // -- |Image Buffer Reader| --------------------------------------------------
   `define IMAGE_READER_ENABLE
