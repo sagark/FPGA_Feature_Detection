@@ -33,7 +33,16 @@ wire enable_sig;
 wire [7:0] next_data;
 
 reg delay_mod1;
+reg sr_out_r; 
 
+shift_ram SR(
+    .clk(clock),
+    .q(shift_reg_out),
+    .d(shift_reg_in)
+);
+
+
+//assign sr_out_r = shift_reg_out;
 assign ord_valid = valid_r | valid;
 assign next_col = (colcount == 840 ? 0 : (ord_valid ? colcount + 1 : colcount));
 assign next_row = (rowcount == 640 ? 0 : (colcount == 840 ? rowcount + 1 : rowcount));
@@ -42,17 +51,12 @@ assign next_data = (enable_sig ? data : data_int);
 assign fifo_read = enable_sig;
 assign shift_reg_in = data_int;
 // NEED TO ASSIGN DATAOUT BASED ON SIGNAL
-assign dataout = delay_mod1 ? shift_reg_out : data_int;
+assign dataout = delay_mod1 ? sr_out_r : data_int;
 assign valid_out_in = (rowcount < 600) && (colcount < 800) && ( ord_valid | (rowcount % 2 == 1));
 assign delay_mod1_in = (rowcount % 2 == 1);
 assign current_rowcount = rowcount;
 assign current_colcount = colcount;
 
-shift_ram SR(
-    .clk(clock),
-    .q(shift_reg_out),
-    .d(shift_reg_in)
-);
 
 
 always @(posedge clock) begin
@@ -63,6 +67,7 @@ always @(posedge clock) begin
         validout <= 0;
         delay_mod1 <= 0;
         data_int <= 0;
+        sr_out_r <= 0;
     end else begin
         valid_r <= valid;
         colcount <= next_col;
@@ -70,6 +75,7 @@ always @(posedge clock) begin
         validout <= valid_out_in;
         delay_mod1 <= delay_mod1_in;
         data_int <= next_data;
+        sr_out_r <= shift_reg_out;
     end
 end
 
