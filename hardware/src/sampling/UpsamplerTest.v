@@ -20,6 +20,9 @@ module UpsamplerTest();
     wire validout;
     wire fifo_read;
 
+    wire [9:0] current_rowcount;
+    wire [9:0] current_colcount;
+ 
 // plan: first test one row
 // give it 420 pixels
 // by doing: pixel 
@@ -40,8 +43,8 @@ module UpsamplerTest();
     task checkOutput;
         begin
             //if (validout == 1'b1) begin
-                $display("dataout: %h, validout: %b, fifo_read %b", 
-                                     dataout, validout, fifo_read);
+                $display("dataout: %h, validout: %b, fifo_read %b, current_rowcount %d, current_colcount %d", 
+                                     dataout, validout, fifo_read, current_rowcount, current_colcount);
                 //$finish();
             //end
         end
@@ -55,6 +58,9 @@ module UpsamplerTest();
         .valid(validin),
         .data(datain),
 
+        .current_rowcount(current_rowcount),
+        .current_colcount(current_colcount),
+
         .dataout(dataout),
         .validout(validout),
         .fifo_read(fifo_read)
@@ -67,10 +73,11 @@ module UpsamplerTest();
         rst = 0;
         begin: testerWrap
             integer x, y;
-            for (y = 0; y < 2; y = y + 1) begin // CURRENTLY TESTING TWO ROWS
+            for (y = 0; y < 4; y = y + 1) begin // output will skip rows starting with odd y's
+                // EACH ITERATION DOES TWO
                 for (x = 0; x < 420; x = x + 1) begin
                     validin = 1;
-                    datain = x;
+                    datain = x+y;
                     //$display("(%d, %d)", x,  y);
                     checkOutput();
                     #2;
@@ -83,5 +90,3 @@ module UpsamplerTest();
         end
     end
 endmodule
-
-
