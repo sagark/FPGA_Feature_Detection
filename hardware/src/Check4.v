@@ -1,4 +1,4 @@
-module check4 (
+module Check4 (
     input clock1,
     input clock2,
     input clock3,
