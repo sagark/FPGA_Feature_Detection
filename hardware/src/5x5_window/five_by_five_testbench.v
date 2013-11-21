@@ -12,9 +12,9 @@ module five_by_five_testbench ();
 	reg [7:0] expected_outputs [num_tests-1:0];
 	
 	integer i, j, fail_count;
-	wire current_input;
-	wire current_output;
-	wire expected_output;
+	wire [7:0] current_input;
+	wire [7:0] current_out;
+	wire [7:0] expected_output;
 	wire blanking_out;
 	wire valid_out;
 	assign current_input = inputs[i];
@@ -45,8 +45,8 @@ module five_by_five_testbench ();
 		fail_count = 0;
 		valid_in = 0;
 		reset = 1;
-		$readmemh("gaussian_inputs.hex", inputs);
-		$readmemh("gaussian_outputs.hex", expected_outputs);
+		$readmemh("gaussian_test_input.hex", inputs);
+		$readmemh("gaussian_test_output.hex", expected_outputs);
 
 		#40
 
@@ -71,14 +71,14 @@ module five_by_five_testbench ();
 			else if ((i > 1) & ((i-1) % 400 == 0)) blanking_in = 1;
 			else blanking_in = 0;
 			if (current_out != expected_output) begin
-				$display("FAIL: expected: %d received: %d", expected_output, current_out);
+				$display("FAIL: expected: %d received: %d Iteration: %d", expected_output, current_out, j);
 				fail_count = fail_count + 1;
 			end
 			if (valid_out != 1) begin
 				$display("FAIL: Output is not valid when it should be.");
 				fail_count  = fail_count + 1;
 			end
-			if (fail_count > 9) $finish();
+			if (fail_count > 99) $finish();
 			#10;
 		end
 		if (fail_count == 0) $display("ALL TESTS PASSED");
