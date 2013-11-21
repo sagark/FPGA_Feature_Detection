@@ -63,8 +63,8 @@ module x_window #(
 			OUT <= divide_result;
 		end
 
-	assign operand0 = { A4, 0 };
-	assign operand1 = { 0, A4 };
+	assign operand0 = { A4, 1'b0 };
+	assign operand1 = { 1'b0, A4 };
 	assign divide_result = operand0 + operand1;
 	assign divide_result_8 = divide_result[18:11];
 

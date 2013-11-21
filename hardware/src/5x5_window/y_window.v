@@ -102,8 +102,8 @@ module y_window #(
 			end
 		endcase
 
-	assign operand0 = { C5, 0 };
-	assign operand1 = { 0, C5 };
+	assign operand0 = { C5, 1'b0 };
+	assign operand1 = { 1'b0, C5 };
 	assign divide_result = operand0 + operand1;
 	assign divide_result_8 = divide_result[18:11];
 

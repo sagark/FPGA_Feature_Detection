@@ -2,16 +2,16 @@
 
 module five_by_five_testbench ();
 
-	localparam num_tests = 134,400;
+	localparam num_tests = 134400;
 	localparam delay = 1272;
 
 	reg reset;
 	reg clock;
 
-	reg [7:0] inputs [num_tests-1:0];
+	reg [7:0] inputs [num_tests+delay-1:0];
 	reg [7:0] expected_outputs [num_tests-1:0];
 	
-	integer i, j;
+	integer i, j, fail_count;
 	wire current_input;
 	wire current_output;
 	wire expected_output;
@@ -37,11 +37,12 @@ module five_by_five_testbench ();
 		.validin(valid_in_wire),
 		.dout(current_out),
 		.blanking_out(blanking_out),
-		.valid_out(valid_out));
+		.validout(valid_out));
 
 	initial begin
 		i = 0;
 		j = 0;
+		fail_count = 0;
 		valid_in = 0;
 		reset = 1;
 		$readmemh("gaussian_inputs.hex", inputs);
@@ -52,9 +53,38 @@ module five_by_five_testbench ();
 		reset = 0;
 
 		#40
-
-		// Insert test code here
-
+		valid_in = 1;
+		for (i = 0; i < delay; i = i + 1) begin
+			if ((i > 0) & (i % 400 == 0)) blanking_in = 1;
+			else if ((i > 1) & ((i-1) % 400 == 0)) blanking_in = 1;
+			else blanking_in = 0;
+			if (valid_out == 1) begin
+				$display("FAIL: Output is valid when it should not be.");
+				fail_count  = fail_count + 1;
+			end
+			#10;
+		end
+		i = delay - 1;
+		for (j = 0; j < num_tests; j = j + 1) begin
+			i = i + 1;
+			if ((i > 0) & (i % 400 == 0)) blanking_in = 1;
+			else if ((i > 1) & ((i-1) % 400 == 0)) blanking_in = 1;
+			else blanking_in = 0;
+			if (current_out != expected_output) begin
+				$display("FAIL: expected: %d received: %d", expected_output, current_out);
+				fail_count = fail_count + 1;
+			end
+			if (valid_out != 1) begin
+				$display("FAIL: Output is not valid when it should be.");
+				fail_count  = fail_count + 1;
+			end
+			if (fail_count > 9) $finish();
+			#10;
+		end
+		if (fail_count == 0) $display("ALL TESTS PASSED");
+		else $display("AT LEAST ONE FAILURE");
+		$finish();
 	end
+
 
 endmodule
