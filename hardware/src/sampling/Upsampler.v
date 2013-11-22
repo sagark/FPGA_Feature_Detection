@@ -44,14 +44,14 @@ shift_ram SR(
 
 //assign sr_out_r = shift_reg_out;
 assign ord_valid = valid_r | valid;
-assign next_col = (colcount == 840 ? 0 : (ord_valid ? colcount + 1 : colcount));
+assign next_col = (colcount == 840 ? 0 : ((ord_valid | rowcount % 2 == 1) ? colcount + 1 : colcount));
 assign next_row = (rowcount == 640 ? 0 : (colcount == 840 ? rowcount + 1 : rowcount));
 assign enable_sig = valid && (colcount % 2 == 0) && (rowcount % 2 == 0);
 assign next_data = (enable_sig ? data : data_int);
 assign fifo_read = enable_sig;
 assign shift_reg_in = data_int;
 // NEED TO ASSIGN DATAOUT BASED ON SIGNAL
-assign dataout = delay_mod1 ? sr_out_r : data_int;
+assign dataout = (colcount %2 == 0) ? 8'b00000001 : 8'b00000000; //delay_mod1 ? sr_out_r : data_int;
 assign valid_out_in = (rowcount < 600) && (colcount < 800) && ( ord_valid | (rowcount % 2 == 1));
 assign delay_mod1_in = (rowcount % 2 == 1);
 assign current_rowcount = rowcount;
