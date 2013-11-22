@@ -27,7 +27,7 @@ module five_by_five_testbench ();
 	assign valid_in_wire = valid_in;
 
 	initial clock = 1;
-	always #5 clock = ~clock;
+	always #10 clock = ~clock;
 
 	five_by_five_window #() dut(
 		.reset(reset),
@@ -48,13 +48,13 @@ module five_by_five_testbench ();
 		$readmemh("gaussian_test_input.hex", inputs);
 		$readmemh("gaussian_test_output.hex", expected_outputs);
 
-		#40
+		#80
 
 		reset = 0;
 
-		#40
+		#80
 		valid_in = 1;
-		for (i = 0; i < delay-1; i = i + 1) begin
+		for (i = 0; i < delay; i = i + 1) begin
 			if ((i > 0) & (i % 400 == 0)) blanking_in = 1;
 			else if ((i > 1) & ((i-1) % 400 == 0)) blanking_in = 1;
 			else blanking_in = 0;
@@ -62,15 +62,16 @@ module five_by_five_testbench ();
 				$display("FAIL: Output is valid when it should not be.");
 				fail_count  = fail_count + 1;
 			end
-			#10;
+			#20;
 		end
-		i = delay - 2;
-		for (j = 0; j < num_tests; j = j + 1) begin
+		i  = i - 1;
+		j = 0;
+		while (j < num_tests) begin
 			i = i + 1;
 			if ((i > 0) & (i % 400 == 0)) blanking_in = 1;
 			else if ((i > 1) & ((i-1) % 400 == 0)) blanking_in = 1;
 			else blanking_in = 0;
-			if (current_out != expected_output) begin
+			if (((current_out < expected_output-5) || (current_out > expected_output+5)) & ~((current_out == 0) & (expected_output == 0))) begin
 				$display("FAIL: expected: %d received: %d Iteration: %d", expected_output, current_out, j);
 				fail_count = fail_count + 1;
 			end
@@ -79,7 +80,8 @@ module five_by_five_testbench ();
 				fail_count  = fail_count + 1;
 			end
 			if (fail_count > 99) $finish();
-			#10;
+			j = j + 1;
+			#20;
 		end
 		if (fail_count == 0) $display("ALL TESTS PASSED");
 		else $display("AT LEAST ONE FAILURE");
