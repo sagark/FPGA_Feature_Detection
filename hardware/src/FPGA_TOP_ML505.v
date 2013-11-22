@@ -254,7 +254,7 @@ module FPGA_TOP_ML505(
       .vga_start(vga_start),
       .vga_start_ack(stc_img_start_ack),
       .vga_video(new_vga_video),
-      .vga_video_valid(new_vga_valid));
+      .vga_video_valid(1'b1));
 
   `endif // IMAGE_WRITER_ENABLE
 
