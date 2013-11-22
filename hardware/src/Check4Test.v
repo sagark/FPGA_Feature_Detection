@@ -31,14 +31,16 @@ module Check4Test();
     // test exp output / real output, report err
     task checkOutput;
         begin
+                if (validout) begin
                 $display("dataout: %h, validout: %b", 
                                      dataout, validout);
+                end
                 //$finish();
         end
     endtask
 
 //device under test
-check4 dut(
+Check4 dut(
     .clock1(Clock),
     .clock2(Clock),
     .clock3(Clock),
@@ -58,20 +60,32 @@ check4 dut(
         #2
         rst = 0;
         begin: testerWrap
-            integer x, y;
-            for (y = 0; y < 10; y = y + 1) begin // loop over frame
-                for (x = 0; x < 800; x = x + 1) begin
-                    datain = 400;
-                    validin = 1;
-                    checkOutput();
-                    #2;
+            integer x, y, z;
+            for (z = 0; z < 2; z = z + 1) begin
+                for (y = 0; y < 600; y = y + 1) begin // loop over frame
+                    for (x = 0; x < 800; x = x + 1) begin
+                        datain = 400;
+                        validin = 1;
+                        checkOutput();
+                        #2;
+                    end
+                    for (x = 0; x < 100; x = x + 1) begin
+                        datain = 400;
+                        validin = 0;
+                        checkOutput();
+                        #2;
+                    end
+
                 end
-                for (x = 0; x < 100; x = x + 1) begin
-                    datain = 400;
-                    validin = 0;
-                    checkOutput();
-                    #2;
+                for (y = 0; y < 100; y = y + 1) begin 
+                    for (x = 0; x < 900; x = x + 1) begin
+                        datain = 400;
+                        validin = 0;
+                        checkOutput();
+                        #2;
+                    end
                 end
+                $display("DONE FRAME %d", z);
             end
             //$display("ALL TESTS PASS. SUCCESSFULLY GENERATED %d FRAMES.", numFrames);
             $finish(); // stop running, all tests pass

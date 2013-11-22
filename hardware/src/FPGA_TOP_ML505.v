@@ -188,6 +188,10 @@ module FPGA_TOP_ML505(
   wire stc_img_valid;
   wire [7:0] stc_img_video;
 
+    wire stat_ready;
+    wire [7:0] stat_to_ch_data;
+
+
   `ifdef VGA_ENABLE
     assign stc_img_clock = vga_clock;
   `else
@@ -202,7 +206,7 @@ module FPGA_TOP_ML505(
       .start(vga_start & stc_img_enable),
       .start_ack(stc_img_start_ack),
 
-      .ready(1'b1),
+      .ready(stat_ready), // TODO: CONNECT STATIC IMAGE BLANK READY HERE
       .valid(stc_img_valid),
       .pixel(stc_img_video));
   `endif
@@ -235,6 +239,7 @@ module FPGA_TOP_ML505(
     wire [7:0] new_vga_video;
     wire new_vga_valid;
 
+
     ImageBufferWriter #(
       .N_PIXEL(N_PIXEL))
     ibw (
@@ -254,10 +259,32 @@ module FPGA_TOP_ML505(
       .vga_start(vga_start),
       .vga_start_ack(stc_img_start_ack),
       .vga_video(new_vga_video),
-      .vga_video_valid(1'b1));
+      .vga_video_valid(new_vga_valid));
 
   `endif // IMAGE_WRITER_ENABLE
 
+/*
+    wire [35:0] chipscope_control;
+    chipscope_icon icon(
+        .CONTROL0(chipscope_control)
+    );
+    chipscope_ila ila(
+        .CONTROL(chipscope_control),
+        .CLK(bg_clock),
+        .DATA({vga_start, stc_img_start_ack, new_vga_video, new_vga_valid, 5'b0}),
+        .TRIG0(reset)
+    );
+*/
+
+    StaticImageBlank stat(
+        .clock(bg_clock),
+        .reset(reset),
+        .pixel(stc_img_video),
+
+        .valid(stc_img_valid),
+        .ready(stat_ready),
+        .pixelout(stat_to_ch_data)
+    );
 
     Check4 ch(
         .clock1(bg_clock),
@@ -265,8 +292,8 @@ module FPGA_TOP_ML505(
         .clock3(bg_clock),
         .reset(reset),
 
-        .din(stc_img_video),
-        .valid(stc_img_valid),
+        .din(stat_to_ch_data),
+        .valid(stat_ready),
 
         .dout(new_vga_video),
         .validout(new_vga_valid)
@@ -446,5 +473,5 @@ module FPGA_TOP_ML505(
     assign SRAM_D=32'dz;
   `endif // SRAM_ENABLE
 
-  assign GPIO_LED = {~reset, GPIO_SW_C, pll_lock, swap_count[4], 4'b0};
+  assign GPIO_LED = {~reset, GPIO_SW_C, pll_lock, swap_count[4], new_vga_valid,  3'b0};
 endmodule

@@ -2,4 +2,4 @@ set MODULE Check4Test
 start $MODULE
 add wave $MODULE/*
 add wave $MODULE/dut/*
-run 2000us
+run 3000us

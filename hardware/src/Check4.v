@@ -32,6 +32,31 @@ DownsamplerWrap down(
     .validout(down_to_five_valid)
 );
 
+UpsamplerWrap up(
+    .clock1(clock2),
+    .clock2(clock3),
+    .reset(reset),
+
+    .din(down_to_five_data),
+    .valid(down_to_five_valid),
+
+    .dataout(dout),
+    .validout(validout)
+);
+
+/*DownsamplerWrap down(
+    .clock1(clock1),
+    .clock2(clock2),
+    .reset(reset),
+
+    .valid(valid),
+    .data(din),
+
+    .dataout(down_to_five_data),
+    .blankingregion(down_to_five_blank), 
+    .validout(down_to_five_valid)
+);
+
 five_by_five_window five(
 	.reset(reset),
 	.clock(clock2),
@@ -55,5 +80,5 @@ UpsamplerWrap up(
     .dataout(dout),
     .validout(validout)
 );
-
+*/
 endmodule
