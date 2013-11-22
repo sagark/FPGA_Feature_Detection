@@ -55,12 +55,8 @@ module five_by_five_testbench ();
 		#80
 		valid_in = 1;
 		for (i = 0; i < delay; i = i + 1) begin
-			blanking_in = 0;
-			for (k = 400; k < 420; k = k + 1) begin
-				if ((i != 0) & (i % k == 0)) begin
-					blanking_in = 1;
-				end
-			end
+			if ( (400 <= (i % 420)) & ((i % 420) <= 419) & (i != 0) ) blanking_in = 1;
+			else blanking_in = 0;
 			if (valid_out == 1) begin
 				$display("FAIL: Output is valid when it should not be.");
 				fail_count  = fail_count + 1;
@@ -71,13 +67,9 @@ module five_by_five_testbench ();
 		j = 0;
 		while (j < num_tests) begin
 			i = i + 1;
-			blanking_in = 0;
-			for (k = 400; k < 420; k = k + 1) begin
-				if ((i != 0) & (i % k == 0)) begin
-					blanking_in = 1;
-				end
-			end
-			if (((current_out < expected_output-5) || (current_out > expected_output+5)) & ~((current_out == 0) & (expected_output == 0))) begin
+			if ( (400 <= (i % 420)) & ((i % 420) <= 419) ) blanking_in = 1;
+			else blanking_in = 0;
+			if (((current_out < expected_output-1) || (current_out > expected_output+1)) & (current_out != expected_output)) begin
 				$display("FAIL: expected: %d received: %d Iteration: %d, blanking: %d", expected_output, current_out, j, blanking_out);
 				fail_count = fail_count + 1;
 			end
