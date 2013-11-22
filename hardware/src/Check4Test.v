@@ -18,6 +18,8 @@ module Check4Test();
     wire [7:0] dataout;
     wire validout;
 
+    wire [9:0] rowcount;
+    wire [9:0] colcount;
 
     // prep dut for first run
     task initGenerator;
@@ -32,8 +34,8 @@ module Check4Test();
     task checkOutput;
         begin
                 if (validout) begin
-                $display("dataout: %h, validout: %b", 
-                                     dataout, validout);
+                $display("dataout: %h, validout: %b, rowcount %d, colcount %d", 
+                                     dataout, validout, rowcount, colcount);
                 end
                 //$finish();
         end
@@ -49,6 +51,10 @@ Check4 dut(
     .din(datain),
     .valid(validin),
 
+    .rowcount(rowcount),
+    .colcount(colcount),
+
+
     .dout(dataout),
     .validout(validout)
 );
@@ -61,7 +67,7 @@ Check4 dut(
         rst = 0;
         begin: testerWrap
             integer x, y, z;
-            for (z = 0; z < 2; z = z + 1) begin
+            for (z = 0; z < 4; z = z + 1) begin
                 for (y = 0; y < 600; y = y + 1) begin // loop over frame
                     for (x = 0; x < 800; x = x + 1) begin
                         datain = 400;

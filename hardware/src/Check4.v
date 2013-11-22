@@ -7,6 +7,10 @@ module Check4 (
     input [7:0] din,
     input valid,
 
+    output [9:0] rowcount,
+    output [9:0] colcount,
+
+
     output [7:0] dout,
     output validout
 );
@@ -39,6 +43,9 @@ UpsamplerWrap up(
 
     .din(down_to_five_data),
     .valid(down_to_five_valid),
+
+    .rownum(rowcount),
+    .colnum(colcount),
 
     .dataout(dout),
     .validout(validout)
