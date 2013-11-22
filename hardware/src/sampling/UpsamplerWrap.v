@@ -6,6 +6,10 @@ module UpsamplerWrap(
     input [7:0] din,
     input valid,
 
+    output [9:0] rownum,
+    output [9:0] colnum,
+
+
     output [7:0] dataout,
     output validout
 );
@@ -26,12 +30,16 @@ up_fifo fif1(
 );
 
 
-Upsampler up(
+Upsampler2 up(
     .clock(clock2),
     .reset(reset),
     
     .valid(validconnect),
     .data(dout),
+
+    .current_rowcount(rownum),
+    .current_colcount(colnum),
+
     .fifo_read(rd_en),
     .dataout(dataout),
     .validout(validout)
