@@ -75,7 +75,7 @@ module five_by_five_window #(
 	assign yin2 = aout2;
 	assign yin3 = aout3;
 	assign yin4 = aout4;
-	assign dout = yout;
+	assign dout = (yout & ~({8{blanking_out}}));
 	assign asel_wire = asel;
 	assign hsel_wire = hsel;
 	assign validout = yvalidout;
