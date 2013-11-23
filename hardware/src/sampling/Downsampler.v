@@ -22,7 +22,7 @@ wire [9:0] next_col;
 // and gate before validout reg has new input: (valid OR blankingregionin)
 assign validoutregin = (rowcounter % 2 == 0) && (colcounter % 2 == 0) && (valid || blankingregionin);
 assign blankingregionin = (rowcounter > 599) || (colcounter > 799);
-assign dataoutregin = (blankingregionin ? 8'b00000000 : data);
+assign dataoutregin = (blankingregionin ? 8'b00000010 : data);
 assign next_row = (rowcounter == 639 && colcounter == 839) ? 0 : ((colcounter == 839) ? rowcounter + 1 : rowcounter);
 assign next_col = (colcounter == 839) ? 0 : ((valid | blankingregionin) ? colcounter + 1 : colcounter);
 
