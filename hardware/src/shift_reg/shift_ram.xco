@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.6
-# Date: Thu Nov 21 02:08:19 2013
+# Date: Fri Nov 22 22:28:32 2013
 #
 ##############################################################
 #
@@ -41,17 +41,17 @@ SELECT RAM-based_Shift_Register xilinx.com:ip:c_shift_ram:11.0
 # BEGIN Parameters
 CSET asyncinitradix=2
 CSET asyncinitval=00000000
-CSET ce=false
+CSET ce=true
 CSET cepriority=Sync_Overrides_CE
 CSET component_name=shift_ram
 CSET defaultdata=00000000
 CSET defaultdataradix=2
-CSET depth=840
+CSET depth=800
 CSET meminitfile=no_coe_file_loaded
 CSET optgoal=Resources
 CSET readmiffile=false
 CSET reglastbit=true
-CSET sclr=false
+CSET sclr=true
 CSET shiftregtype=Fixed_Length
 CSET sinit=false
 CSET sset=false
@@ -64,4 +64,4 @@ CSET width=8
 MISC pkg_timestamp=2012-11-05T14:22:31Z
 # END Extra information
 GENERATE
-# CRC: 8639a41e
+# CRC: da1e2e82

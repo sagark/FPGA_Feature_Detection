@@ -23,6 +23,10 @@ wire [7:0] five_to_up_data;
 wire five_to_up_blank;
 wire five_to_up_valid;
 
+/*
+wire upsampler_valid_in = (!down_to_five_blank) && down_to_five_valid;
+
+
 DownsamplerWrap down(
     .clock1(clock1),
     .clock2(clock2),
@@ -32,7 +36,7 @@ DownsamplerWrap down(
     .data(din),
 
     .dataout(down_to_five_data),
-    .blankingregion(down_to_five_blank), 
+    .blankingregion(down_to_five_blank),
     .validout(down_to_five_valid)
 );
 
@@ -42,7 +46,7 @@ UpsamplerWrap up(
     .reset(reset),
 
     .din(down_to_five_data),
-    .valid(down_to_five_valid),
+    .valid(upsampler_valid_in),
 
     .rownum(rowcount),
     .colnum(colcount),
@@ -50,8 +54,10 @@ UpsamplerWrap up(
     .dataout(dout),
     .validout(validout)
 );
+*/
 
-/*DownsamplerWrap down(
+wire up_blank_in = (!five_to_up_blank) && five_to_up_valid;
+DownsamplerWrap down(
     .clock1(clock1),
     .clock2(clock2),
     .reset(reset),
@@ -82,10 +88,10 @@ UpsamplerWrap up(
     .reset(reset),
 
     .din(five_to_up_data),
-    .valid(five_to_up_valid),
+    .valid(up_blank_in),
 
     .dataout(dout),
     .validout(validout)
 );
-*/
+
 endmodule

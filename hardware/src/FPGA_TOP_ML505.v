@@ -58,6 +58,7 @@ module FPGA_TOP_ML505(
   wire clk_50M_pre, clk_50M;
   wire clk_200M_pre, clk_200M;
   wire clk_10M_pre, clk_10M;
+  wire clk_2_5M_pre, clk_2_5M;
   wire pll_fb, pll_lock;
 
   PLL_BASE #(
@@ -79,7 +80,11 @@ module FPGA_TOP_ML505(
     
     .CLKOUT2_DIVIDE(60),
     .CLKOUT2_DUTY_CYCLE(0.5),
-    .CLKOUT2_PHASE(0.0))
+    .CLKOUT2_PHASE(0.0), 
+    
+    .CLKOUT3_DIVIDE(120),
+    .CLKOUT3_DUTY_CYCLE(0.5),
+    .CLKOUT3_PHASE(0.0))
   clk_pll (
     .RST(1'b0),
     .CLKIN(clk_100M_g),
@@ -88,13 +93,13 @@ module FPGA_TOP_ML505(
     .LOCKED(pll_lock),
     .CLKOUT0(clk_50M_pre),
     .CLKOUT1(clk_200M_pre),
-    .CLKOUT2(clk_10M_pre));
-
+    .CLKOUT2(clk_10M_pre),
+    .CLKOUT3(clk_2_5M_pre));
   // Global buffers for output clocks
   BUFG  clk_buf_50M   (.I(clk_50M_pre),.O(clk_50M));
   BUFG  clk_buf_200M  (.I(clk_200M_pre),.O(clk_200M));
   BUFG  clk_buf_10M  (.I(clk_10M_pre),.O(clk_10M));
-
+  BUFG  clk_buf_5M   (.I(clk_2_5M_pre), .O(clk_2_5M));
   // -- |Reset| ---------------------------------------------------------------
   
   
@@ -239,6 +244,9 @@ module FPGA_TOP_ML505(
     wire [7:0] new_vga_video;
     wire new_vga_valid;
 
+    wire validswitch;
+
+    assign validswitch = new_vga_valid & GPIO_DIP[2];
 
     ImageBufferWriter #(
       .N_PIXEL(N_PIXEL))
@@ -259,7 +267,7 @@ module FPGA_TOP_ML505(
       .vga_start(vga_start),
       .vga_start_ack(stc_img_start_ack),
       .vga_video(new_vga_video),
-      .vga_video_valid(new_vga_valid));
+      .vga_video_valid(validswitch));
 
   `endif // IMAGE_WRITER_ENABLE
 

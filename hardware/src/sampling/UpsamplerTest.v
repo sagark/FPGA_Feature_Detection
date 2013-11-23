@@ -51,19 +51,19 @@ module UpsamplerTest();
     endtask
 
     // device under test
-    Upsampler dut(
+    UpsamplerWrap dut(
         .reset(rst), 
-        .clock(Clock),
+        .clock1(Clock),
+        .clock2(Clock),
 
         .valid(validin),
-        .data(datain),
+        .din(datain),
 
-        .current_rowcount(current_rowcount),
-        .current_colcount(current_colcount),
+        .rownum(current_rowcount),
+        .colnum(current_colcount),
 
         .dataout(dataout),
-        .validout(validout),
-        .fifo_read(fifo_read)
+        .validout(validout)
     );
 
 
@@ -73,16 +73,20 @@ module UpsamplerTest();
         rst = 0;
         begin: testerWrap
             integer x, y;
-            for (y = 0; y < 4; y = y + 1) begin // output will skip rows starting with odd y's
+            for (y = 0; y < 300; y = y + 1) begin // output will skip rows starting with odd y's
                 // EACH ITERATION DOES TWO
-                for (x = 0; x < 420; x = x + 1) begin
+                for (x = 0; x < 400; x = x + 1) begin
                     validin = 1;
-                    datain = x+y;
+                    if ( x % 2 == 0) begin
+                        datain = 8'b00000000;
+                    end else begin
+                        datain = 8'b00000001;
+                    end
                     //$display("(%d, %d)", x,  y);
                     checkOutput();
                     #2;
-                    checkOutput();
-                    #2;
+                    //checkOutput();
+                    //#2;
                 end
             end
             //$display("ALL TESTS PASS. SUCCESSFULLY GENERATED %d FRAMES.", numFrames);

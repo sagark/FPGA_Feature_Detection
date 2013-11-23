@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <spirit:design xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xilinx="http://www.xilinx.com" >
    <spirit:vendor>xilinx.com</spirit:vendor>
-   <spirit:library>CoreGen</spirit:library>
+   <spirit:library>project</spirit:library>
    <spirit:name>upsample_shift</spirit:name>
    <spirit:version>1.0</spirit:version>
    <spirit:componentInstances>
@@ -13,9 +13,9 @@
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SHIFTREGTYPE">Fixed_Length</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.OPTGOAL">Resources</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.REGLASTBIT">true</spirit:configurableElementValue>
-            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CE">false</spirit:configurableElementValue>
+            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CE">true</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.WIDTH">8</spirit:configurableElementValue>
-            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.DEPTH">840</spirit:configurableElementValue>
+            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.DEPTH">800</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.DEFAULTDATARADIX">2</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.DEFAULTDATA">00000000</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.READMIFFILE">false</spirit:configurableElementValue>
@@ -23,7 +23,7 @@
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ASYNCINITRADIX">2</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ASYNCINITVAL">00000000</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SSET">false</spirit:configurableElementValue>
-            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SCLR">false</spirit:configurableElementValue>
+            <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SCLR">true</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SINIT">false</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SYNCINITRADIX">2</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SYNCINITVAL">00000000</spirit:configurableElementValue>
@@ -31,7 +31,7 @@
             <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CEPRIORITY">Sync_Overrides_CE</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_XDEVICEFAMILY">virtex5</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_WIDTH">8</spirit:configurableElementValue>
-            <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_DEPTH">840</spirit:configurableElementValue>
+            <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_DEPTH">800</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_ADDR_WIDTH">4</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SHIFT_TYPE">0</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_OPT_GOAL">0</spirit:configurableElementValue>
@@ -39,11 +39,11 @@
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SINIT_VAL">00000000</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_DEFAULT_DATA">00000000</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_HAS_A">0</spirit:configurableElementValue>
-            <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_HAS_CE">0</spirit:configurableElementValue>
+            <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_HAS_CE">1</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_REG_LAST_BIT">1</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SYNC_PRIORITY">1</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SYNC_ENABLE">0</spirit:configurableElementValue>
-            <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_HAS_SCLR">0</spirit:configurableElementValue>
+            <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_HAS_SCLR">1</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_HAS_SSET">0</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_HAS_SINIT">0</spirit:configurableElementValue>
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_MEM_INIT_FILE">no_coe_file_loaded</spirit:configurableElementValue>
@@ -51,7 +51,7 @@
             <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_READ_MIF">0</spirit:configurableElementValue>
          </spirit:configurableElementValues>
          <spirit:vendorExtensions>
-            <xilinx:instanceProperties>
+            <xilinx:instanceProperties xmlns:xilinx="http://www.xilinx.com">
                <xilinx:projectOptions>
                   <xilinx:projectName>upsample_shift</xilinx:projectName>
                   <xilinx:outputDirectory>./</xilinx:outputDirectory>
@@ -86,9 +86,6 @@
             </xilinx:instanceProperties>
             <xilinx:generationHistory>
                <xilinx:fileSet>
-                  <xilinx:name>apply_current_project_options_generator</xilinx:name>
-               </xilinx:fileSet>
-               <xilinx:fileSet>
                   <xilinx:name>customization_generator</xilinx:name>
                </xilinx:fileSet>
                <xilinx:fileSet>
@@ -99,8 +96,8 @@
                   <xilinx:file>
                      <xilinx:name>./shift_ram.xco</xilinx:name>
                      <xilinx:userFileType>xco</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:19 GMT 2013</xilinx:timeStamp>
-                     <xilinx:checkSum>0x6C34FCAD</xilinx:checkSum>
+                     <xilinx:timeStamp>Fri Nov 22 22:28:32 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x67DACF3B</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
                </xilinx:fileSet>
@@ -112,8 +109,8 @@
                   <xilinx:file>
                      <xilinx:name>./shift_ram.ngc</xilinx:name>
                      <xilinx:userFileType>ngc</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:53 GMT 2013</xilinx:timeStamp>
-                     <xilinx:checkSum>0xD22635DC</xilinx:checkSum>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:06 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x660781DC</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
                </xilinx:fileSet>
@@ -122,8 +119,8 @@
                   <xilinx:file>
                      <xilinx:name>./shift_ram.ngc</xilinx:name>
                      <xilinx:userFileType>ngc</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:53 GMT 2013</xilinx:timeStamp>
-                     <xilinx:checkSum>0x8EE1AEC0</xilinx:checkSum>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:07 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x730E2F7D</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
                </xilinx:fileSet>
@@ -135,8 +132,8 @@
                   <xilinx:file>
                      <xilinx:name>./shift_ram.veo</xilinx:name>
                      <xilinx:userFileType>veo</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:53 GMT 2013</xilinx:timeStamp>
-                     <xilinx:checkSum>0x9BF9E9AD</xilinx:checkSum>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:07 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xA4143D29</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
                </xilinx:fileSet>
@@ -145,8 +142,8 @@
                   <xilinx:file>
                      <xilinx:name>./shift_ram.v</xilinx:name>
                      <xilinx:userFileType>verilog</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:55 GMT 2013</xilinx:timeStamp>
-                     <xilinx:checkSum>0x0A7C9A28</xilinx:checkSum>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:08 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x2E3BD774</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
                </xilinx:fileSet>
@@ -159,7 +156,7 @@
                      <xilinx:name>./shift_ram/doc/c_shift_ram_v11_0_readme.txt</xilinx:name>
                      <xilinx:userFileType>ignore</xilinx:userFileType>
                      <xilinx:userFileType>txt</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:08 GMT 2013</xilinx:timeStamp>
                      <xilinx:checkSum>0xA4FD6549</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
@@ -167,7 +164,7 @@
                      <xilinx:name>./shift_ram/doc/c_shift_ram_v11_0_vinfo.html</xilinx:name>
                      <xilinx:userFileType>ignore</xilinx:userFileType>
                      <xilinx:userFileType>unknown</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:08 GMT 2013</xilinx:timeStamp>
                      <xilinx:checkSum>0x015AD067</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
@@ -175,7 +172,7 @@
                      <xilinx:name>./shift_ram/doc/ds228_shift_ram.pdf</xilinx:name>
                      <xilinx:userFileType>ignore</xilinx:userFileType>
                      <xilinx:userFileType>pdf</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:08 GMT 2013</xilinx:timeStamp>
                      <xilinx:checkSum>0x5A68C6F6</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
@@ -188,8 +185,8 @@
                   <xilinx:file>
                      <xilinx:name>./shift_ram.asy</xilinx:name>
                      <xilinx:userFileType>asy</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:55 GMT 2013</xilinx:timeStamp>
-                     <xilinx:checkSum>0x54A68ADD</xilinx:checkSum>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:08 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x25DE9DE5</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
                </xilinx:fileSet>
@@ -199,7 +196,7 @@
                      <xilinx:name>./shift_ram_xmdf.tcl</xilinx:name>
                      <xilinx:userFileType>tclXmdf</xilinx:userFileType>
                      <xilinx:userFileType>tcl</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:55 GMT 2013</xilinx:timeStamp>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:08 GMT 2013</xilinx:timeStamp>
                      <xilinx:checkSum>0x69944B13</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
@@ -210,7 +207,7 @@
                      <xilinx:name>./shift_ram.gise</xilinx:name>
                      <xilinx:userFileType>ignore</xilinx:userFileType>
                      <xilinx:userFileType>gise</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:58 GMT 2013</xilinx:timeStamp>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:11 GMT 2013</xilinx:timeStamp>
                      <xilinx:checkSum>0x393305C9</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
@@ -218,8 +215,8 @@
                      <xilinx:name>./shift_ram.xise</xilinx:name>
                      <xilinx:userFileType>ignore</xilinx:userFileType>
                      <xilinx:userFileType>xise</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:08:58 GMT 2013</xilinx:timeStamp>
-                     <xilinx:checkSum>0xE2685369</xilinx:checkSum>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:11 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0xB271206C</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
                </xilinx:fileSet>
@@ -229,7 +226,7 @@
                      <xilinx:name>./shift_ram.gise</xilinx:name>
                      <xilinx:userFileType>ignore</xilinx:userFileType>
                      <xilinx:userFileType>gise</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:09:01 GMT 2013</xilinx:timeStamp>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:14 GMT 2013</xilinx:timeStamp>
                      <xilinx:checkSum>0x23A523CF</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
@@ -237,8 +234,8 @@
                      <xilinx:name>./shift_ram.xise</xilinx:name>
                      <xilinx:userFileType>ignore</xilinx:userFileType>
                      <xilinx:userFileType>xise</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:09:01 GMT 2013</xilinx:timeStamp>
-                     <xilinx:checkSum>0xFBCD5929</xilinx:checkSum>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:14 GMT 2013</xilinx:timeStamp>
+                     <xilinx:checkSum>0x42C3FEF6</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
                </xilinx:fileSet>
@@ -252,7 +249,7 @@
                      <xilinx:userFileType>ignore</xilinx:userFileType>
                      <xilinx:userFileType>txtFlist</xilinx:userFileType>
                      <xilinx:userFileType>txt</xilinx:userFileType>
-                     <xilinx:timeStamp>Thu Nov 21 02:09:01 GMT 2013</xilinx:timeStamp>
+                     <xilinx:timeStamp>Fri Nov 22 22:29:14 GMT 2013</xilinx:timeStamp>
                      <xilinx:checkSum>0x2D49E86E</xilinx:checkSum>
                      <xilinx:generationId>generationID_1879581046</xilinx:generationId>
                   </xilinx:file>
