@@ -8,8 +8,8 @@ module StaticImageBlank(
     output [7:0] pixelout
 );
 
-localparam ROW_COMPARE = 650;
-localparam COL_COMPARE = 850;
+localparam ROW_COMPARE = 639;
+localparam COL_COMPARE = 839;
 
 
 reg [9:0] rowcount;
