@@ -80,8 +80,8 @@ module Upsampler3Test();
 					output_valuesD[valid_count - 2400]= dataout;
 				valid_count = valid_count + 1;
 			end
-			if (i == 399) begin validin = 0; #400; validin = 1; end
-			if (i == 799) begin validin = 0; #400; validin = 1; end
+			//if (i == 399) begin validin = 0; #400; validin = 1; end
+			//if (i == 799) begin validin = 0; #400; validin = 1; end
 			#20;
 			datain = datain + 1;
 		end

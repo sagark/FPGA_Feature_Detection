@@ -23,7 +23,7 @@ wire [7:0] five_to_up_data;
 wire five_to_up_blank;
 wire five_to_up_valid;
 
-/*
+
 wire upsampler_valid_in = (!down_to_five_blank) && down_to_five_valid;
 
 
@@ -54,8 +54,8 @@ UpsamplerWrap up(
     .dataout(dout),
     .validout(validout)
 );
-*/
 
+/*
 wire up_blank_in = (!five_to_up_blank) && five_to_up_valid;
 DownsamplerWrap down(
     .clock1(clock1),
@@ -93,5 +93,5 @@ UpsamplerWrap up(
     .dataout(dout),
     .validout(validout)
 );
-
+*/
 endmodule

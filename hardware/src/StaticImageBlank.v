@@ -8,20 +8,20 @@ module StaticImageBlank(
     output [7:0] pixelout
 );
 
-localparam ROW_COMPARE = 639;
-localparam COL_COMPARE = 839;
+localparam ROW_COMPARE = 700;
+localparam COL_COMPARE = 900;
 
 
-reg [9:0] rowcount;
-reg [9:0] colcount;
+reg [12:0] rowcount;
+reg [12:0] colcount;
 
-wire [9:0] nextcolcount;
-wire [9:0] nextrowcount;
+wire [12:0] nextcolcount;
+wire [12:0] nextrowcount;
 
 
 assign nextrowcount = (rowcount == ROW_COMPARE ? 0 : (colcount == COL_COMPARE ? rowcount + 1 : rowcount));
 assign nextcolcount = (colcount == COL_COMPARE ? 0 : (valid ? colcount + 1 : colcount));
-assign ready = (rowcount < 600 && colcount < 800);
+assign ready = (rowcount < 600 && colcount < 800) && valid;
 assign pixelout = ready ? pixel : 0;
 
 
