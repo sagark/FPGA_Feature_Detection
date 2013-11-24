@@ -197,6 +197,9 @@ module FPGA_TOP_ML505(
     wire down_ready;
     wire [7:0] stat_to_ch_data;
 
+    wire stat_ready_muxed;
+
+    assign stat_ready_muxed = GPIO_DIP[2] ? stat_ready : 1'b1;
 
   `ifdef VGA_ENABLE
     assign stc_img_clock = vga_clock;
@@ -212,7 +215,7 @@ module FPGA_TOP_ML505(
       .start(vga_start & stc_img_enable),
       .start_ack(stc_img_start_ack),
 
-      .ready(stat_ready), // TODO: CONNECT STATIC IMAGE BLANK READY HERE
+      .ready(stat_ready_muxed), // TODO: CONNECT STATIC IMAGE BLANK READY HERE
       .valid(stc_img_valid),
       .pixel(stc_img_video));
   `endif
@@ -245,9 +248,11 @@ module FPGA_TOP_ML505(
     wire [7:0] new_vga_video;
     wire new_vga_valid;
 
-    wire validswitch;
+    wire video_valid_muxed;
+    wire [7:0] video_muxed;
 
-    assign validswitch = new_vga_valid & GPIO_DIP[2];
+    assign video_valid_muxed = GPIO_DIP[2] ? new_vga_valid : stc_img_valid;
+    assign video_muxed = GPIO_DIP[2] ? new_vga_video : stc_img_video;
 
     ImageBufferWriter #(
       .N_PIXEL(N_PIXEL))
@@ -267,23 +272,10 @@ module FPGA_TOP_ML505(
 
       .vga_start(vga_start),
       .vga_start_ack(stc_img_start_ack),
-      .vga_video(new_vga_video),
-      .vga_video_valid(validswitch));
+      .vga_video(video_muxed),
+      .vga_video_valid(video_valid_muxed));
 
   `endif // IMAGE_WRITER_ENABLE
-
-/*
-    wire [35:0] chipscope_control;
-    chipscope_icon icon(
-        .CONTROL0(chipscope_control)
-    );
-    chipscope_ila ila(
-        .CONTROL(chipscope_control),
-        .CLK(bg_clock),
-        .DATA({vga_start, stc_img_start_ack, new_vga_video, new_vga_valid, 5'b0}),
-        .TRIG0(reset)
-    );
-*/
 
     StaticImageBlank stat(
         .clock(bg_clock),
