@@ -42,7 +42,7 @@ wire sr_clk_en;
 
 assign sr_clk_en = (rowcount % 2 == 1) | valid ;
 assign shift_reg_in = data;
-//assign dataout = (colcount % 2 == 0 ? 8'b00000000 : 8'b00000001 );
+//assign dataout = (colcount[2] == 0 ? 8'b00000011 : 8'b00000001 );
 assign dataout = (rowcount % 2 == 1) ? shift_reg_out : data;
 assign validout  = /*(push_extra > 100) ? 0 :*/ ((rowcount % 2 == 1) || valid );
 assign next_col = ((valid || (rowcount % 2 == 1)) && (colcount == NUMCOL)) ? 0 : ((valid || (rowcount % 2 == 1)) ? (colcount + 1) : colcount);

@@ -194,6 +194,7 @@ module FPGA_TOP_ML505(
   wire [7:0] stc_img_video;
 
     wire stat_ready;
+    wire down_ready;
     wire [7:0] stat_to_ch_data;
 
 
@@ -290,7 +291,8 @@ module FPGA_TOP_ML505(
         .pixel(stc_img_video),
 
         .valid(stc_img_valid),
-        .ready(stat_ready),
+        .readyStatic(stat_ready),
+        .readyDown(down_ready),
         .pixelout(stat_to_ch_data)
     );
 
@@ -301,7 +303,7 @@ module FPGA_TOP_ML505(
         .reset(reset),
 
         .din(stat_to_ch_data),
-        .valid(stat_ready),
+        .valid(down_ready),
 
         .dout(new_vga_video),
         .validout(new_vga_valid)

@@ -10,6 +10,9 @@ module Downsampler(
     output reg blankingregion
 );
 
+localparam ROW_WITH_PAD = 639;
+localparam COL_WITH_PAD = 839;
+
 reg [12:0] rowcounter, colcounter;
 //reg valid_r;
 
@@ -23,8 +26,8 @@ wire [12:0] next_col;
 assign validoutregin = (rowcounter % 2 == 0) && (colcounter % 2 == 0) && (valid || blankingregionin);
 assign blankingregionin = (rowcounter > 599) || (colcounter > 799);
 assign dataoutregin = (blankingregionin ? 3 : data);
-assign next_row = ((rowcounter == 639) && (colcounter == 839)) ? 0 : ((colcounter == 839) ? (rowcounter + 1) : rowcounter);
-assign next_col = (colcounter == 839) ? 0 : ((valid | blankingregionin) ? (colcounter + 1) : colcounter);
+assign next_row = ((rowcounter == ROW_WITH_PAD) && (colcounter == COL_WITH_PAD)) ? 0 : ((colcounter == COL_WITH_PAD) ? (rowcounter + 1) : rowcounter);
+assign next_col = (colcounter == COL_WITH_PAD) ? 0 : ((valid | blankingregionin) ? (colcounter + 1) : colcounter);
 
 
 always @(posedge clock) begin
