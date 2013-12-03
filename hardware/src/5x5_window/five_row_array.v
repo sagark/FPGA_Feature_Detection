@@ -20,11 +20,22 @@ module five_row_array #(
 	wire [7:0] array3_in, array3_out;
 	wire [7:0] array4_in, array4_out;
 
-	shift_ram_420 array0(.clk(clock), .sclr(reset), .ce(validin), .d(array0_in), .q(array0_out));
-	shift_ram_420 array1(.clk(clock), .sclr(reset), .ce(validin), .d(array1_in), .q(array1_out));
-	shift_ram_420 array2(.clk(clock), .sclr(reset), .ce(validin), .d(array2_in), .q(array2_out));
-	shift_ram_420 array3(.clk(clock), .sclr(reset), .ce(validin), .d(array3_in), .q(array3_out));
-	shift_ram_420 array4(.clk(clock), .sclr(reset), .ce(validin), .d(array4_in), .q(array4_out));
+	generate
+	if (width == 420) begin
+		shift_ram_420 array0(.clk(clock), .sclr(reset), .ce(validin), .d(array0_in), .q(array0_out));
+		shift_ram_420 array1(.clk(clock), .sclr(reset), .ce(validin), .d(array1_in), .q(array1_out));
+		shift_ram_420 array2(.clk(clock), .sclr(reset), .ce(validin), .d(array2_in), .q(array2_out));
+		shift_ram_420 array3(.clk(clock), .sclr(reset), .ce(validin), .d(array3_in), .q(array3_out));
+		shift_ram_420 array4(.clk(clock), .sclr(reset), .ce(validin), .d(array4_in), .q(array4_out));
+	end
+	else if (width == 210) begin
+		shift_ram_210 array0(.clk(clock), .sclr(reset), .ce(validin), .d(array0_in), .q(array0_out));
+		shift_ram_210 array1(.clk(clock), .sclr(reset), .ce(validin), .d(array1_in), .q(array1_out));
+		shift_ram_210 array2(.clk(clock), .sclr(reset), .ce(validin), .d(array2_in), .q(array2_out));
+		shift_ram_210 array3(.clk(clock), .sclr(reset), .ce(validin), .d(array3_in), .q(array3_out));
+		shift_ram_210 array4(.clk(clock), .sclr(reset), .ce(validin), .d(array4_in), .q(array4_out));	
+	end
+	endgenerate
 
 	assign array0_in = asel[0] ? din : array0_out;
 	assign array1_in = asel[1] ? din : array1_out;

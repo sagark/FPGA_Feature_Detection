@@ -1,5 +1,8 @@
 module five_by_five_window #(
-	parameter width = 420
+	parameter width = 420,
+	parameter h0 = 6,
+	parameter h1 = 58,
+	parameter h2 = 128
 )(
 	input reset,
 	input clock,
@@ -22,7 +25,7 @@ module five_by_five_window #(
 	reg [4:0] asel;
 	reg [8:0] x_count;
 
-	x_window #() my_x_window(
+	x_window #(.h0(h0), .h1(h1), .h2(h2)) my_x_window(
 		.clock(clock),
 		.reset(reset),
 		.validin(xvalidin),	
@@ -30,7 +33,7 @@ module five_by_five_window #(
 		.validout(xvalidout),
 		.dout(xout));
 
-	five_row_array #() my_five_row_array(
+	five_row_array #(.width(width)) my_five_row_array(
 		.clock(clock),
 		.reset(reset),
 		.validin(avalidin),
@@ -43,7 +46,7 @@ module five_by_five_window #(
 		.dout3(aout3),
 		.dout4(aout4));
 
-	y_window #() my_y_window(
+	y_window #(.h0(h0), .h1(h1), .h2(h2)) my_y_window(
 		.clock(clock),
 		.reset(reset),
 		.validin(yvalidin),
@@ -56,14 +59,16 @@ module five_by_five_window #(
 		.validout(yvalidout),
 		.dout(yout));
 
-	`define large_window
-	`ifdef large_window
-	wire intermediate;
-	delay_1088 delay0 (.clk(clock), .sclr(reset), .ce(validin), .d(blanking_in), .q(intermediate));
-	delay_184 delay1 (.clk(clock), .sclr(reset), .ce(validin), .d(intermediate), .q(blanking_out));
-	`else
-	delay_642 delay0 (.clk(clock), .sclr(reset), .ce(validin), .d(blanking_in), .q(blanking_out));
-	`endif
+	generate
+	if (width == 420) begin
+		wire intermediate;
+		delay_1088 delay0 (.clk(clock), .sclr(reset), .ce(validin), .d(blanking_in), .q(intermediate));
+		delay_184 delay1 (.clk(clock), .sclr(reset), .ce(validin), .d(intermediate), .q(blanking_out));
+	end
+	else if (width == 210) begin
+		delay_642 delay0 (.clk(clock), .sclr(reset), .ce(validin), .d(blanking_in), .q(blanking_out));
+	end
+	endgenerate
 
 	assign xin = blanking_in ? 8'b00000000 : din;
 	assign xvalidin = validin;
