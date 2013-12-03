@@ -155,7 +155,7 @@ module FPGA_TOP_ML505(
     .bg_done_ack(bg_done_ack));
 
   // -- |VGA Capture| ----------------------------------------------------------
-  //`define VGA_ENABLE
+  `define VGA_ENABLE
 
   wire vga_clock;
   wire vga_start, vga_start_ack;
@@ -294,8 +294,8 @@ module FPGA_TOP_ML505(
         .clock3(bg_clock),
         .reset(reset),
 
-        .din(stat_to_ch_data),
-        .valid(down_ready),
+        .din(vga_video),
+        .valid(vga_video_valid),
 
         .dout(new_vga_video),
         .validout(new_vga_valid)
