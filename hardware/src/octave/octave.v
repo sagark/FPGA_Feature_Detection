@@ -41,6 +41,7 @@ module octave #(
 	wire gauss0_blankingout, gauss1_blankingout, gauss2_blankingout, gauss3_blankingout, gauss4_blankingout;
 
 	reg [8:0] d0,d1,d2,d3;
+    reg d0_v,d1_v,d2_v,d3_v;
 
 	// Instantiate each 5x5 window
 	/*
@@ -182,7 +183,7 @@ module octave #(
 	// Create shift registers to delay 5x5 outputs for the purpose of taking the difference
 	generate
 	if (width == 420) begin
-		wire inter0, inter1, inter2, inter3, inter4;
+		wire [7:0] inter0, inter1, inter2, inter3, inter4;
 		shiftdelay_1088 delay0a (.clk(clock), .sclr(reset), .ce(gauss0_validout), .d(gauss0_dout), .q(inter0));
 		shiftdelay_184  delay0b (.clk(clock), .sclr(reset), .ce(gauss0_validout), .d(inter0), .q(shift0_dout));
 		shiftdelay_1088 delay1a (.clk(clock), .sclr(reset), .ce(gauss1_validout), .d(gauss1_dout), .q(inter1));
@@ -206,21 +207,53 @@ module octave #(
 
 	// Registers to pipeline difference calculations
 	always @(posedge clock) begin
-		if (reset) d0 <= 9'b100000000;
-		else if (gauss1_validout) d0 <= {gauss1_blankingout, ((shift0_dout - gauss1_dout) << difference_shift)};
+		if (reset) begin
+            d0 <= 9'b100000000;
+            d0_v <= 0;
+        end
+		else if (gauss1_validout) begin
+            d0 <= {gauss1_blankingout, ((shift0_dout - gauss1_dout) << difference_shift)};
+            d0_v <= 1;
+        end
+        else d0_v <= 0;
 	end
+
 	always @(posedge clock) begin
-		if (reset) d1 <= 9'b100000000;
-		else if (gauss1_validout) d1 <= {gauss2_blankingout, ((shift1_dout - gauss2_dout) << difference_shift)};
+		if (reset) begin
+            d1 <= 9'b100000000;
+            d1_v <= 0;
+        end
+		else if (gauss1_validout) begin
+            d1 <= {gauss1_blankingout, ((shift1_dout - gauss2_dout) << difference_shift)};
+            d1_v <= 1;
+        end
+        else d1_v <= 0;
 	end
+
 	always @(posedge clock) begin
-		if (reset) d2 <= 9'b100000000;
-		else if (gauss1_validout) d2 <= {gauss3_blankingout, ((shift2_dout - gauss3_dout) << difference_shift)};
+		if (reset) begin
+            d2 <= 9'b100000000;
+            d2_v <= 0;
+        end
+		else if (gauss1_validout) begin
+            d2 <= {gauss1_blankingout, ((shift2_dout - gauss3_dout) << difference_shift)};
+            d2_v <= 1;
+        end
+        else d2_v <= 0;
 	end
+
 	always @(posedge clock) begin
-		if (reset) d3 <= 9'b100000000;
-		else if (gauss1_validout) d3 <= {gauss4_blankingout, ((shift3_dout - gauss4_dout) << difference_shift)};
+		if (reset) begin
+            d3 <= 9'b100000000;
+            d3_v <= 0;
+        end
+		else if (gauss1_validout) begin
+            d3 <= {gauss1_blankingout, ((shift3_dout - gauss4_dout) << difference_shift)};
+            d3_v <= 1;
+        end
+        else d3_v <= 0;
 	end
+
 
 	// Assign outputs for gaussian images
 	assign g0_dout = gauss0_dout;
@@ -239,10 +272,10 @@ module octave #(
 	assign d1_dout = d1[7:0];
 	assign d2_dout = d2[7:0];
 	assign d3_dout = d3[7:0];
-	assign d0_valid = ~d0[8];
-	assign d1_valid = ~d1[8];
-	assign d2_valid = ~d2[8];
-	assign d3_valid = ~d3[8];
+	assign d0_valid = ~d0[8] & d0_v;
+	assign d1_valid = ~d1[8] & d1_v;
+	assign d2_valid = ~d2[8] & d2_v;
+	assign d3_valid = ~d3[8] & d3_v;
 
 	// Assign outputs to the next octave
 	assign next_octave_dout = gauss3_dout;
