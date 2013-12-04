@@ -188,7 +188,7 @@ module octave #(
 		shiftdelay_1088 delay1a (.clk(clock), .sclr(reset), .ce(gauss1_validout), .d(gauss1_dout), .q(inter1));
 		shiftdelay_184  delay1b (.clk(clock), .sclr(reset), .ce(gauss1_validout), .d(inter1), .q(shift1_dout));
 		shiftdelay_1088 delay2a (.clk(clock), .sclr(reset), .ce(gauss2_validout), .d(gauss2_dout), .q(inter2));
-		shiftdelay_184  delay2b (.clk(clock), .sclr(reset), .ce(gauss2_validout), .d(inter2), .q(shift0_dout));
+		shiftdelay_184  delay2b (.clk(clock), .sclr(reset), .ce(gauss2_validout), .d(inter2), .q(shift2_dout));
 		shiftdelay_1088 delay3a (.clk(clock), .sclr(reset), .ce(gauss3_validout), .d(gauss3_dout), .q(inter3));
 		shiftdelay_184  delay3b (.clk(clock), .sclr(reset), .ce(gauss3_validout), .d(inter3), .q(shift3_dout));
 		shiftdelay_1088 delay4a (.clk(clock), .sclr(reset), .ce(gauss4_validout), .d(gauss4_dout), .q(inter4));
