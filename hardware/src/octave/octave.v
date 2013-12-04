@@ -1,6 +1,6 @@
 module octave #(
 	parameter width = 420,
-	parameter difference_shift = 4
+	parameter difference_shift = 3
 )(
 	input reset,
 	input clock,
@@ -43,6 +43,27 @@ module octave #(
 	reg [8:0] d0,d1,d2,d3;
 
 	// Instantiate each 5x5 window
+	/*
+	Octave 0:
+	s=0, sigma_0 =   0.80  using row_filt=[   6.   58.  128.   58.    6.]
+	s=1, sigma_1 =   1.01  using row_filt=[  14.   63.  102.   63.   14.]
+	s=2, sigma_2 =   1.27  using row_filt=[ 24.  62.  84.  62.  24.]
+	s=3, sigma_3 =   1.60  using row_filt=[ 33.  59.  72.  59.  33.]
+	s=4, sigma_4 =   2.02  using row_filt=[ 39.  57.  64.  57.  39.]
+
+	Octave 1:
+
+	s=3, sigma_o =   1.60  using row_filt=[ 33.  59.  72.  59.  33.]
+	s=4, sigma_o =   2.02  using row_filt=[ 39.  57.  64.  57.  39.]
+
+	s=5, sigma_o =   2.54  using row_filt=[ 43.  55.  59.  55.  43.]
+	s=6, sigma_o =   3.20  using row_filt=[ 46.  54.  56.  54.  46.]
+	s=7, sigma_o =   4.03  using row_filt=[ 48.  53.  54.  53.  48.]
+	*/
+
+	generate
+	if (width == 420) begin
+
 	five_by_five_window #(.width(width), .h0(6), .h1(58), .h2(128)) gauss0 (
 		.reset(reset),
 		.clock(clock),
@@ -97,6 +118,66 @@ module octave #(
 		.validout(gauss4_validout),
 		.blanking_out(gauss4_blankingout)
 		);
+
+	end else if (width == 210) begin
+
+	five_by_five_window #(.width(width), .h0(33), .h1(59), .h2(72)) gauss0 (
+		.reset(reset),
+		.clock(clock),
+		.din(din),
+		.blanking_in(blanking_in),
+		.validin(validin),
+		.dout(gauss0_dout),
+		.validout(gauss0_validout),
+		.blanking_out(gauss0_blankingout)
+		);
+
+	five_by_five_window #(.width(width), .h0(39), .h1(57), .h2(64)) gauss1 (
+		.reset(reset),
+		.clock(clock),
+		.din(gauss0_dout),
+		.blanking_in(gauss0_blankingout),
+		.validin(gauss0_validout),
+		.dout(gauss1_dout),
+		.validout(gauss1_validout),
+		.blanking_out(gauss1_blankingout)
+		);
+
+	five_by_five_window #(.width(width), .h0(43), .h1(55), .h2(59)) gauss2 (
+		.reset(reset),
+		.clock(clock),
+		.din(gauss1_dout),
+		.blanking_in(gauss1_blankingout),
+		.validin(gauss1_validout),
+		.dout(gauss2_dout),
+		.validout(gauss2_validout),
+		.blanking_out(gauss2_blankingout)
+		);
+
+	five_by_five_window #(.width(width), .h0(46), .h1(54), .h2(56)) gauss3 (
+		.reset(reset),
+		.clock(clock),
+		.din(gauss2_dout),
+		.blanking_in(gauss2_blankingout),
+		.validin(gauss2_validout),
+		.dout(gauss3_dout),
+		.validout(gauss3_validout),
+		.blanking_out(gauss3_blankingout)
+		);
+
+	five_by_five_window #(.width(width), .h0(48), .h1(53), .h2(54)) gauss4 (
+		.reset(reset),
+		.clock(clock),
+		.din(gauss3_dout),
+		.blanking_in(gauss3_blankingout),
+		.validin(gauss3_validout),
+		.dout(gauss4_dout),
+		.validout(gauss4_validout),
+		.blanking_out(gauss4_blankingout)
+		);
+
+	end
+	endgenerate
 
 	// Create shift registers to delay 5x5 outputs for the purpose of taking the difference
 	generate
@@ -164,8 +245,8 @@ module octave #(
 	assign d3_valid = ~d3[8];
 
 	// Assign outputs to the next octave
-	assign next_octave_dout = gauss2_dout;
-	assign next_octave_valid = gauss2_validout;
-	assign next_octave_blanking = gauss2_blankingout;
+	assign next_octave_dout = gauss3_dout;
+	assign next_octave_valid = gauss3_validout;
+	assign next_octave_blanking = gauss3_blankingout;
 
 endmodule
