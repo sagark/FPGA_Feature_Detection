@@ -107,7 +107,7 @@ module octave #(
 		shiftdelay_1088 delay1a (.clk(clock), .sclr(reset), .ce(gauss1_validout), .d(gauss1_dout), .q(inter1));
 		shiftdelay_184  delay1b (.clk(clock), .sclr(reset), .ce(gauss1_validout), .d(inter1), .q(shift1_dout));
 		shiftdelay_1088 delay2a (.clk(clock), .sclr(reset), .ce(gauss2_validout), .d(gauss2_dout), .q(inter2));
-		shiftdelay_184  delay2b (.clk(clock), .sclr(reset), .ce(gauss2_validout), .d(inter2), .q(shift0_dout));
+		shiftdelay_184  delay2b (.clk(clock), .sclr(reset), .ce(gauss2_validout), .d(inter2), .q(shift2_dout));
 		shiftdelay_1088 delay3a (.clk(clock), .sclr(reset), .ce(gauss3_validout), .d(gauss3_dout), .q(inter3));
 		shiftdelay_184  delay3b (.clk(clock), .sclr(reset), .ce(gauss3_validout), .d(inter3), .q(shift3_dout));
 		shiftdelay_1088 delay4a (.clk(clock), .sclr(reset), .ce(gauss4_validout), .d(gauss4_dout), .q(inter4));
@@ -125,19 +125,19 @@ module octave #(
 
 	// Registers to pipeline difference calculations
 	always @(posedge clock) begin
-		if (reset) d0 <= 0;
+		if (reset) d0 <= 9'b100000000;
 		else if (gauss1_validout) d0 <= {gauss1_blankingout, ((shift0_dout - gauss1_dout) << difference_shift)};
 	end
 	always @(posedge clock) begin
-		if (reset) d1 <= 0;
+		if (reset) d1 <= 9'b100000000;
 		else if (gauss1_validout) d1 <= {gauss2_blankingout, ((shift1_dout - gauss2_dout) << difference_shift)};
 	end
 	always @(posedge clock) begin
-		if (reset) d2 <= 0;
+		if (reset) d2 <= 9'b100000000;
 		else if (gauss1_validout) d2 <= {gauss3_blankingout, ((shift2_dout - gauss3_dout) << difference_shift)};
 	end
 	always @(posedge clock) begin
-		if (reset) d3 <= 0;
+		if (reset) d3 <= 9'b100000000;
 		else if (gauss1_validout) d3 <= {gauss4_blankingout, ((shift3_dout - gauss4_dout) << difference_shift)};
 	end
 
