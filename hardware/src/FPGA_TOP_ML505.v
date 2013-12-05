@@ -155,7 +155,7 @@ module FPGA_TOP_ML505(
     .bg_done_ack(bg_done_ack));
 
   // -- |VGA Capture| ----------------------------------------------------------
-  //`define VGA_ENABLE
+  `define VGA_ENABLE
 
   wire vga_clock;
   wire vga_start, vga_start_ack;
@@ -288,20 +288,48 @@ module FPGA_TOP_ML505(
         .pixelout(stat_to_ch_data)
     );
 
+    wire [7:0] between_oct_dout;
+    wire between_oct_valid;
+    wire [7:0] twoXvideo;
+    wire twoXvalid;
+    wire [7:0] fourXvideo;
+    wire fourXvalid;
+
     Check4 ch(
         .clock1(bg_clock),
         .clock2(bg_clock),
         .clock3(bg_clock),
         .reset(reset),
 
-        .selector(GPIO_DIP[7:3]),
+        .selector({1'b0, GPIO_DIP[6:3]}),
 
-        .din(stat_to_ch_data),
-        .valid(down_ready),
+        .din(vga_video),
+        .valid(vga_video_valid),
 
-        .dout(new_vga_video),
-        .validout(new_vga_valid)
+        .dout(twoXvideo),
+        .validout(twoXvalid),
+
+        .next_octave_dout(between_oct_dout),
+        .next_octave_valid(between_oct_valid)
     );
+
+    Check4_4x ch2(
+        .clock1(bg_clock),
+        .clock2(bg_clock),
+        .clock3(bg_clock),
+        .reset(reset),
+
+        .selector({1'b0, GPIO_DIP[6:3]}),
+
+        .din(between_oct_dout),
+        .valid(between_oct_valid),
+
+        .dout(fourXvideo),
+        .validout(fourXvalid)
+    );
+
+    assign new_vga_video = GPIO_DIP[7] ? fourXvideo : twoXvideo;
+    assign new_vga_valid = GPIO_DIP[7] ? fourXvalid : twoXvalid;
 
   // -- |Image Buffer Reader| --------------------------------------------------
   `define IMAGE_READER_ENABLE

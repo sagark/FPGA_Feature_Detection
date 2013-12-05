@@ -1,4 +1,4 @@
-module Check4 (
+module Check4_4x (
     input clock1,
     input clock2,
     input clock3,
@@ -12,11 +12,9 @@ module Check4 (
     output [9:0] rowcount,
     output [9:0] colcount,
 
-    output [7:0] dout,
-    output validout,
 
-    output [7:0] next_octave_dout,
-    output next_octave_valid
+    output [7:0] dout,
+    output validout
 );
 
 wire [7:0] down_to_five_data;
@@ -54,7 +52,7 @@ wire d2_valid;
 wire [7:0] d3_dout;
 wire d3_valid;
 
-DownsamplerWrap down(
+Downsampler4xWrap down(
     .clock1(clock1),
     .clock2(clock2),
     .reset(reset),
@@ -67,9 +65,9 @@ DownsamplerWrap down(
     .validout(down_to_five_valid)
 );
 
-wire next_oct_blank, next_oct_val;
-
-octave oct(
+octave #(
+    .width(210)
+) oct(
     .reset(reset),
     .clock(clock2),
     .din(down_to_five_data),
@@ -101,16 +99,10 @@ octave oct(
     .d2_valid(d2_valid),
 
     .d3_dout(d3_dout),
-    .d3_valid(d3_valid),
-
-    .next_octave_dout(next_octave_dout),
-    .next_octave_valid(next_oct_val),
-    .next_octave_blanking(next_oct_blank)
+    .d3_valid(d3_valid)  
 );
 
-assign next_octave_valid = next_oct_val & (~next_oct_blank);
-
-UpsamplerWrap up(
+Upsampler4xWrap up(
     .clock1(clock2),
     .clock2(clock3),
     .reset(reset),
@@ -156,6 +148,5 @@ always@* begin
         five_to_up_data = 0;
     end
 end
-
 
 endmodule

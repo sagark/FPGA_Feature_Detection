@@ -1,4 +1,4 @@
-module UpsamplerWrap(
+module Upsampler4xWrap(
     input clock1,
     input clock2,
     input reset,
@@ -30,7 +30,7 @@ up_fifo fif1(
 );
 
 
-Upsampler up(
+Upsampler4x up(
     .clock(clock2),
     .reset(reset),
     
