@@ -155,7 +155,7 @@ module FPGA_TOP_ML505(
     .bg_done_ack(bg_done_ack));
 
   // -- |VGA Capture| ----------------------------------------------------------
-  `define VGA_ENABLE
+  //`define VGA_ENABLE
 
   wire vga_clock;
   wire vga_start, vga_start_ack;
@@ -295,16 +295,35 @@ module FPGA_TOP_ML505(
     wire [7:0] fourXvideo;
     wire fourXvalid;
 
+    reg [3:0] gpio_dip_6_3;
+    reg gpio_dip_7;
+    reg switched;
+
+    always @(posedge bg_clock)
+	if (reset) begin
+	    gpio_dip_6_3 <= GPIO_DIP[6:3];
+	    gpio_dip_7 <= GPIO_DIP[7];
+	    switched <= 0;
+	end
+	else if (vga_start) begin
+	    if (GPIO_DIP[6:3] != gpio_dip_6_3) gpio_dip_6_3 <= GPIO_DIP[6:3];
+	    if (GPIO_DIP[7] != gpio_dip_7) gpio_dip_7 <= GPIO_DIP[7];
+	    if ((GPIO_DIP[6:3] != gpio_dip_6_3) | (GPIO_DIP[7] != gpio_dip_7)) switched <= 1;
+	end
+	else if (switched == 1) switched <= 0;
+
     Check4 ch(
         .clock1(bg_clock),
         .clock2(bg_clock),
         .clock3(bg_clock),
-        .reset(reset),
+        .reset(reset | switched),
 
-        .selector({1'b0, GPIO_DIP[6:3]}),
+        .selector({1'b0, gpio_dip_6_3}),
 
-        .din(vga_video),
-        .valid(vga_video_valid),
+        //.din(vga_video),
+        //.valid(vga_video_valid),
+        .din(stat_to_ch_data),
+        .valid(down_ready),
 
         .dout(twoXvideo),
         .validout(twoXvalid),
@@ -317,9 +336,9 @@ module FPGA_TOP_ML505(
         .clock1(bg_clock),
         .clock2(bg_clock),
         .clock3(bg_clock),
-        .reset(reset),
+        .reset(reset | switched),
 
-        .selector({1'b0, GPIO_DIP[6:3]}),
+        .selector({1'b0, gpio_dip_6_3}),
 
         .din(between_oct_dout),
         .valid(between_oct_valid),
@@ -328,8 +347,8 @@ module FPGA_TOP_ML505(
         .validout(fourXvalid)
     );
 
-    assign new_vga_video = GPIO_DIP[7] ? fourXvideo : twoXvideo;
-    assign new_vga_valid = GPIO_DIP[7] ? fourXvalid : twoXvalid;
+    assign new_vga_video = gpio_dip_7 ? fourXvideo : twoXvideo;
+    assign new_vga_valid = gpio_dip_7 ? fourXvalid : twoXvalid;
 
   // -- |Image Buffer Reader| --------------------------------------------------
   `define IMAGE_READER_ENABLE
