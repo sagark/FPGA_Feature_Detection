@@ -64,7 +64,7 @@ module octave #(
 	generate
 	if (width == 420) begin
 
-	five_by_five_window #(.width(width), .h0(6), .h1(58), .h2(128)) gauss0 (
+	five_by_five_window #(.width(width), .h0(6), .h1(58), .h2(128)) gauss0a (
 		.reset(reset),
 		.clock(clock),
 		.din(din),
@@ -75,7 +75,7 @@ module octave #(
 		.blanking_out(gauss0_blankingout)
 		);
 
-	five_by_five_window #(.width(width), .h0(14), .h1(63), .h2(102)) gauss1 (
+	five_by_five_window #(.width(width), .h0(14), .h1(63), .h2(102)) gauss1a (
 		.reset(reset),
 		.clock(clock),
 		.din(gauss0_dout),
@@ -86,7 +86,7 @@ module octave #(
 		.blanking_out(gauss1_blankingout)
 		);
 
-	five_by_five_window #(.width(width), .h0(24), .h1(62), .h2(84)) gauss2 (
+	five_by_five_window #(.width(width), .h0(24), .h1(62), .h2(84)) gauss2a (
 		.reset(reset),
 		.clock(clock),
 		.din(gauss1_dout),
@@ -97,7 +97,7 @@ module octave #(
 		.blanking_out(gauss2_blankingout)
 		);
 
-	five_by_five_window #(.width(width), .h0(33), .h1(59), .h2(72)) gauss3 (
+	five_by_five_window #(.width(width), .h0(33), .h1(59), .h2(72)) gauss3a (
 		.reset(reset),
 		.clock(clock),
 		.din(gauss2_dout),
@@ -108,7 +108,7 @@ module octave #(
 		.blanking_out(gauss3_blankingout)
 		);
 
-	five_by_five_window #(.width(width), .h0(39), .h1(57), .h2(64)) gauss4 (
+	five_by_five_window #(.width(width), .h0(39), .h1(57), .h2(64)) gauss4a (
 		.reset(reset),
 		.clock(clock),
 		.din(gauss3_dout),
@@ -121,7 +121,7 @@ module octave #(
 
 	end else if (width == 210) begin
 
-	five_by_five_window #(.width(width), .h0(33), .h1(59), .h2(72)) gauss0 (
+	five_by_five_window #(.width(width), .h0(33), .h1(59), .h2(72)) gauss0b (
 		.reset(reset),
 		.clock(clock),
 		.din(din),
@@ -132,7 +132,7 @@ module octave #(
 		.blanking_out(gauss0_blankingout)
 		);
 
-	five_by_five_window #(.width(width), .h0(39), .h1(57), .h2(64)) gauss1 (
+	five_by_five_window #(.width(width), .h0(39), .h1(57), .h2(64)) gauss1b (
 		.reset(reset),
 		.clock(clock),
 		.din(gauss0_dout),
@@ -143,7 +143,7 @@ module octave #(
 		.blanking_out(gauss1_blankingout)
 		);
 
-	five_by_five_window #(.width(width), .h0(43), .h1(55), .h2(59)) gauss2 (
+	five_by_five_window #(.width(width), .h0(43), .h1(55), .h2(59)) gauss2b (
 		.reset(reset),
 		.clock(clock),
 		.din(gauss1_dout),
@@ -154,7 +154,7 @@ module octave #(
 		.blanking_out(gauss2_blankingout)
 		);
 
-	five_by_five_window #(.width(width), .h0(46), .h1(54), .h2(56)) gauss3 (
+	five_by_five_window #(.width(width), .h0(46), .h1(54), .h2(56)) gauss3b (
 		.reset(reset),
 		.clock(clock),
 		.din(gauss2_dout),
@@ -165,7 +165,7 @@ module octave #(
 		.blanking_out(gauss3_blankingout)
 		);
 
-	five_by_five_window #(.width(width), .h0(48), .h1(53), .h2(54)) gauss4 (
+	five_by_five_window #(.width(width), .h0(48), .h1(53), .h2(54)) gauss4b (
 		.reset(reset),
 		.clock(clock),
 		.din(gauss3_dout),
@@ -222,8 +222,8 @@ module octave #(
             d1 <= 9'b100000000;
             d1_v <= 0;
         end
-		else if (gauss1_validout) begin
-            d1 <= {gauss1_blankingout, ((shift1_dout - gauss2_dout) << difference_shift)};
+		else if (gauss2_validout) begin
+            d1 <= {gauss2_blankingout, ((shift1_dout - gauss2_dout) << difference_shift)};
             d1_v <= 1;
         end
         else d1_v <= 0;
@@ -234,8 +234,8 @@ module octave #(
             d2 <= 9'b100000000;
             d2_v <= 0;
         end
-		else if (gauss1_validout) begin
-            d2 <= {gauss1_blankingout, ((shift2_dout - gauss3_dout) << difference_shift)};
+		else if (gauss3_validout) begin
+            d2 <= {gauss3_blankingout, ((shift2_dout - gauss3_dout) << difference_shift)};
             d2_v <= 1;
         end
         else d2_v <= 0;
@@ -246,8 +246,8 @@ module octave #(
             d3 <= 9'b100000000;
             d3_v <= 0;
         end
-		else if (gauss1_validout) begin
-            d3 <= {gauss1_blankingout, ((shift3_dout - gauss4_dout) << difference_shift)};
+		else if (gauss4_validout) begin
+            d3 <= {gauss4_blankingout, ((shift3_dout - gauss4_dout) << difference_shift)};
             d3_v <= 1;
         end
         else d3_v <= 0;

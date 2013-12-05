@@ -66,7 +66,7 @@ module five_by_five_window #(
 		delay_184 delay1 (.clk(clock), .sclr(reset), .ce(validin), .d(intermediate), .q(blanking_out));
 	end
 	else if (width == 210) begin
-		delay_642 delay0 (.clk(clock), .sclr(reset), .ce(validin), .d(blanking_in), .q(blanking_out));
+		delay_642 delay2 (.clk(clock), .sclr(reset), .ce(validin), .d(blanking_in), .q(blanking_out));
 	end
 	endgenerate
 

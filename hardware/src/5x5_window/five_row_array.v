@@ -22,18 +22,18 @@ module five_row_array #(
 
 	generate
 	if (width == 420) begin
-		shift_ram_420 array0(.clk(clock), .sclr(reset), .ce(validin), .d(array0_in), .q(array0_out));
-		shift_ram_420 array1(.clk(clock), .sclr(reset), .ce(validin), .d(array1_in), .q(array1_out));
-		shift_ram_420 array2(.clk(clock), .sclr(reset), .ce(validin), .d(array2_in), .q(array2_out));
-		shift_ram_420 array3(.clk(clock), .sclr(reset), .ce(validin), .d(array3_in), .q(array3_out));
-		shift_ram_420 array4(.clk(clock), .sclr(reset), .ce(validin), .d(array4_in), .q(array4_out));
+		shift_ram_420 array0a(.clk(clock), .sclr(reset), .ce(validin), .d(array0_in), .q(array0_out));
+		shift_ram_420 array1a(.clk(clock), .sclr(reset), .ce(validin), .d(array1_in), .q(array1_out));
+		shift_ram_420 array2a(.clk(clock), .sclr(reset), .ce(validin), .d(array2_in), .q(array2_out));
+		shift_ram_420 array3a(.clk(clock), .sclr(reset), .ce(validin), .d(array3_in), .q(array3_out));
+		shift_ram_420 array4a(.clk(clock), .sclr(reset), .ce(validin), .d(array4_in), .q(array4_out));
 	end
 	else if (width == 210) begin
-		shift_ram_210 array0(.clk(clock), .sclr(reset), .ce(validin), .d(array0_in), .q(array0_out));
-		shift_ram_210 array1(.clk(clock), .sclr(reset), .ce(validin), .d(array1_in), .q(array1_out));
-		shift_ram_210 array2(.clk(clock), .sclr(reset), .ce(validin), .d(array2_in), .q(array2_out));
-		shift_ram_210 array3(.clk(clock), .sclr(reset), .ce(validin), .d(array3_in), .q(array3_out));
-		shift_ram_210 array4(.clk(clock), .sclr(reset), .ce(validin), .d(array4_in), .q(array4_out));	
+		shift_ram_210 array0b(.clk(clock), .sclr(reset), .ce(validin), .d(array0_in), .q(array0_out));
+		shift_ram_210 array1b(.clk(clock), .sclr(reset), .ce(validin), .d(array1_in), .q(array1_out));
+		shift_ram_210 array2b(.clk(clock), .sclr(reset), .ce(validin), .d(array2_in), .q(array2_out));
+		shift_ram_210 array3b(.clk(clock), .sclr(reset), .ce(validin), .d(array3_in), .q(array3_out));
+		shift_ram_210 array4b(.clk(clock), .sclr(reset), .ce(validin), .d(array4_in), .q(array4_out));	
 	end
 	endgenerate
 
