@@ -11,11 +11,10 @@ module octaveTestbench ();
 	reg [7:0] inputs [num_tests+delay-1:0];
 	reg [7:0] expected_outputs [num_tests-1:0];
 	
-	integer i, j, fail_count;
-	reg k;
+	integer i, j, k, fail_count;
 	wire [7:0] current_input;
-	wire [7:0] current_out;
-	wire [7:0] expected_output;
+	wire signed [7:0] current_out;
+	wire signed [7:0] expected_output;
 	wire blanking_out;
 	wire valid_out;
 	assign current_input = inputs[i];
@@ -30,7 +29,7 @@ module octaveTestbench ();
 	initial clock = 1;
 	always #10 clock = ~clock;
 
-	octave #() dut(
+	octave #(.difference_shift(0)) dut(
 		.reset(reset),
 		.clock(clock),
 		.din(current_input),
@@ -59,7 +58,7 @@ module octaveTestbench ();
 		#80
 		valid_in = 1;
 		for (i = 0; i < delay; i = i + 1) begin
-			if (( (400 <= (i % 420)) && ((i % 420) <= 419) && (i != 0) ) || (i >= 126000) ) blanking_in = 1;
+			if (( (400 <= (i % 420)) && ((i % 420) <= 419) && (i != 0) ) || (((i % 134400) >= 126000)  && (i != 0)) ) blanking_in = 1;
 			else blanking_in = 0;
 			if (valid_out == 1) begin
 				$display("FAIL: Output is valid when it should not be. i=%d", i);
@@ -72,14 +71,17 @@ module octaveTestbench ();
 		j = 0;
 		while (i < num_tests) begin
 			i = i + 1;
-			if (( (400 <= (i % 420)) && ((i % 420) <= 419) && (i != 0) ) || (i >= 126000) ) blanking_in = 1;
+			if (( (400 <= (i % 420)) && ((i % 420) <= 419) && (i != 0) ) || (((i % 134400) >= 126000)  && (i != 0)) ) blanking_in = 1;
 			else blanking_in = 0;
-			if (((current_out < expected_output-1) || (current_out > expected_output+1)) & (current_out != expected_output)) begin
-				$display("FAIL: expected: %d received: %d Iteration: %d", expected_output, current_out, j);
+			if (((current_out < expected_output-2) || (current_out > expected_output+2)) & (current_out != expected_output)) begin
+				$display("FAIL: expected: %u received: %u Iteration: %d", expected_output, current_out, j);
 				fail_count = fail_count + 1;
 			end
-			if (valid_out != 1) begin
-				$display("FAIL: Output is not valid when it should be.");
+			if ( (valid_out != 1) && ( (j % 420) < 400 ) && ((j % 134400) < 126000)) begin
+				$display("FAIL: Output is not valid when it should be. j=%d",j);
+				fail_count  = fail_count + 1;
+			end else if ( (valid_out == 1) && ( ((j %420) >= 400) && ((j % 420) <= 419) && (j != 0) )) begin
+				$display("FAIL: Output is valid when it shouldn't be. j=%d", j);
 				fail_count  = fail_count + 1;
 			end
 			if (fail_count > 19) $finish();
@@ -92,8 +94,15 @@ module octaveTestbench ();
 			#20;
 		end
 		valid_in = 0;
-		#2688000
-		
+		while (k < 100000) begin
+			if (valid_out == 1) begin
+				$display("FAIL: Output is valid when it shouldn't be. k=%d",k);
+				fail_count  = fail_count + 1;
+			end 
+			k = k + 1;
+			#20;
+		end
+		/*
 		$display("BEGIN TEST 2");
 		k = 1;
 		i = 0;
@@ -131,7 +140,7 @@ module octaveTestbench ();
 		end
 		valid_in = 0;
 		#200
-
+		*/
 		if (fail_count == 0) $display("ALL TESTS PASSED");
 		else $display("AT LEAST ONE FAILURE");
 		$finish();

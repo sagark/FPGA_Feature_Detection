@@ -35,7 +35,6 @@ module octave #(
 	output next_octave_blanking);
 
 	wire [7:0] gauss0_dout, gauss1_dout, gauss2_dout, gauss3_dout, gauss4_dout;
-	wire [7:0] diff0_dout, diff1_dout, diff2_dout, diff3_dout, diff4_dout;
 	wire [7:0] shift0_dout, shift1_dout, shift2_dout, shift3_dout, shift4_dout;
 	wire gauss0_validout, gauss1_validout, gauss2_validout, gauss3_validout, gauss4_validout;
 	wire gauss0_blankingout, gauss1_blankingout, gauss2_blankingout, gauss3_blankingout, gauss4_blankingout;
