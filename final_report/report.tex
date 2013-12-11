@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage[margin=1.0in]{geometry}
-\usepackage{amsmath,textcomp,amssymb,geometry,graphicx,rotating,multirow, listings}
+\usepackage{amsmath,textcomp,amssymb,booktabs,geometry,graphicx,rotating,multirow,listings,wrapfig}
 
 \linespread{0.9}
 
@@ -33,7 +33,7 @@ Abstract goes here.
 
 % [todo] - block diagrams
 
-% [todo] - SRAM arbiter diagram
+% [todo] - SRAM arbiter diagram - ehh probably not
 
 \subsection{Brief Description of Major Submodules}
 
@@ -310,8 +310,8 @@ will receive five input pixels from the five\_row\_array. Each pixel is from the
 same position in a line (such as x=250), and comes from consecutive lines. It is 
 expected that the pixels will start from the leftmost position within a line, 
 and end at the rightmost position. It is also expected that the groups of lines 
-will be received in order from top to bottom (i.e. lines \[1,2,3,4,5\] followed by 
-lines \[2,3,4,5,6\]). These pixels are then multiplied by their corresponding 
+will be received in order from top to bottom (i.e. lines \lbrack 1,2,3,4,5 \rbrack followed by 
+lines \lbrack 2,3,4,5,6 \rbrack). These pixels are then multiplied by their corresponding 
 coefficients and the results are added together. This sum will then be scaled 
 back down to an 8-bit number. To ensure proper results, at least two extra lines 
 of zeros (blanking/padding), need to be added at the end of each frame. This is 
@@ -357,6 +357,33 @@ upper 8 bits and drop the lower 8. This is the same as dividing the result by
 
 \subsubsection{Connections to ImageBufferWriter}
 
+\begin{wraptable}{r}{5.5cm}
+    \caption{ NOTE: Any missing binary numbers (switch combinations) are considered illegal 
+and will cause the swap controller to stall.} \label{wrap-tab:1}
+\begin{tabular}{ c | c | c } \toprule
+Binary & Octave & Image\\\toprule
+00000 & 0 & gauss0\\ \midrule
+00001 & 0 & gauss1\\ \midrule
+00010 & 0 & gauss2\\ \midrule
+00011 & 0 & gauss3\\ \midrule
+00100 & 0 & gauss4\\ \midrule
+00101 & 0 & diff0\\  \midrule
+00110 & 0 & diff1\\  \midrule
+00111 & 0 & diff2\\  \midrule
+01000 & 0 & diff3\\  \midrule
+10000 & 1 & gauss0\\ \midrule
+10001 & 1 & gauss1\\ \midrule
+10010 & 1 & gauss2\\ \midrule
+10011 & 1 & gauss3\\ \midrule
+10100 & 1 & gauss4\\ \midrule
+10101 & 1 & diff0\\  \midrule
+10110 & 1 & diff1\\  \midrule
+10111 & 1 & diff2\\  \midrule
+11000 & 1 & diff3\\  \bottomrule
+\end{tabular}
+\end{wraptable}
+
+
 ImageBufferWriter only requires a data input and a valid signal, and this comes 
 from the upsampler. In this case, we have two upsamplers, one from each octave. 
 Each octave also has nine outputs: five Gaussian outputs and four Difference of 
@@ -370,27 +397,6 @@ ImageBufferWriter. If we consider GPIO\_DIP[3:7] (a particular combination of
 switches) to be a 5-bit binary number, then the following table summarizes which 
 image each number corresponds to:
 
-Binary	Octave	Image
-00000	0	gauss0
-00001	0	gauss1
-00010	0	gauss2
-00011	0	gauss3
-00100	0	gauss4
-00101	0	diff0
-00110	0	diff1
-00111	0	diff2
-01000	0	diff3
-10000	1	gauss0
-10001	1	gauss1
-10010	1	gauss2
-10011	1	gauss3
-10100	1	gauss4
-10101	1	diff0
-10110	1	diff1
-10111	1	diff2
-11000	1	diff3
-NOTE: Any missing binary numbers (switch combinations) are considered illegal 
-and will cause the swap controller to stall.
 
 Switching the input to ImageBufferWriter at the wrong time could result in 
 a shifted image or a stalled swap controller. In order to mitigate these issues, 
