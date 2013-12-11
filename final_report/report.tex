@@ -429,11 +429,26 @@ is similarly asserted for 20 cycles at the end of a row of the image and for
 for the rest of the pipeline to process.
 
 \subsubsection{Upsampler}
-% [todo] - upsampler
+
 This module takes our processed 400x300 images and scales them up by 2x in each
-direction to produce an 800x600 image. 
-
-
+direction to produce an 800x600 image. The upsampler duplicates pixels using 
+two methods. First, to duplicate in the horizontal direction, we simply instruct
+the fifo from which we are reading data to maintain each valid output on its
+data output line for exactly two cycles. Because we are utilizing the 
+first-word-fall-through functionality of the FIFOs, we do not need to explicitly 
+assert read enable in order to ``get'' values. Rather, the next value that the
+fifo is able to represent is simply held there until we request the ``next'' value.
+Thus, upon seeing the assertion of the valid signal of the upsampler fifo, we simply
+wait one clock cycle before asserting our read enable signal to ``clear out'' the old
+value. Thus, as far as our output is concerned, we receive two copies of each valid
+pixel in the horizontal direction. Additionally, to produce the 2x duplication
+in the vertical direction, we take the output from our horizontal duplication ``stage''
+and feed it into a shift register that is 800 bytes wide. Thus, once we have
+processed an entire valid row of 400 input pixels (which outputs 800 valid pixels and 
+additionally fills the shift register with 800 valid pixels), we switch our modules 
+output to the output of the shift register and run for 800 cycles. This produces
+the duplicate row that we need for vertical scaling. This entire mechanism is
+controlled by a set of counters, which will be discussed in the control section.
 
 \subsection{Control}
 
