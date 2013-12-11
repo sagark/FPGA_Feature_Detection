@@ -33,7 +33,17 @@ Abstract goes here.
 
 % [todo] - block diagrams
 
+% [todo] - SRAM arbiter diagram
+
 \subsection{Brief Description of Major Submodules}
+
+\subsubsection{SRAM Arbiter}
+
+The SRAM arbiter is the main interface between SRAM and the rest of our system.
+Essentially, its task is to mediate reads and writes between other modules that
+are competeting for access to our single port SRAM. The arbiter supports two 
+write ports, two read ports, and services a single request (either a single 
+read or a single write) per clock cycle.
 
 \subsubsection{Downsampler.v, Downsampler4x.v}
 The Downsampler module converts the original 800x600 image fed into our processing
