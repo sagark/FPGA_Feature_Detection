@@ -14,15 +14,12 @@ localparam ROW_WITH_PAD = 639;
 localparam COL_WITH_PAD = 839;
 
 reg [12:0] rowcounter, colcounter;
-//reg valid_r;
 
 wire validoutregin, blankingregionin;
 wire [7:0] dataoutregin;
 wire [12:0] next_row;
 wire [12:0] next_col;
 
-// slightly modified from block diagram:
-// and gate before validout reg has new input: (valid OR blankingregionin)
 assign validoutregin = (rowcounter % 2 == 0) && (colcounter % 2 == 0) && (valid || blankingregionin);
 assign blankingregionin = (rowcounter > 599) || (colcounter > 799);
 assign dataoutregin = (blankingregionin ? 3 : data);
@@ -37,14 +34,12 @@ always @(posedge clock) begin
         dataout <= 0;
         validout <= 0;
         blankingregion <= 0;
-        //valid_r <= 0;
     end else begin
         validout <= validoutregin; 
         rowcounter <= next_row;
         colcounter <= next_col;
         blankingregion <= blankingregionin;
         dataout <= dataoutregin;
-        //valid_r <= valid;
     end
 end
 
