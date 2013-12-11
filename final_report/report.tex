@@ -2,6 +2,8 @@
 \usepackage[margin=1.0in]{geometry}
 \usepackage{amsmath,textcomp,amssymb,geometry,graphicx,rotating,multirow, listings}
 
+\linespread{0.9}
+
 \lstset{breaklines=true}
 
 \def\Name{Sahar Mesri, Sagar Karandikar}
@@ -135,17 +137,7 @@ Gaussian), along with a valid signal and a blanking signal.
 
 \paragraph{octave.v}
 
-This module is where the each Difference of Gaussian is computed for a single 
-octave. It contains five Gaussian filter blocks, where the output of one block 
-is fed into the input of the next block. The time between the first valid pixel 
-of one block and the first valid pixel of the next block is determined by the 
-time it takes for one pixel to travel through an entire Gaussian filter. To 
-compute a Difference of Gaussian, the same pixel from each Gaussian filter block 
-needs to be used, despite the delay between the two blocks. This means that the 
-output of the first Gaussian must be stored in a shift register with a depth 
-equal to that delay, while also being routed to the next Gaussian filter block. 
-The output of the next Gaussian is then subtracted from the output of the shift 
-register. The result is the Difference of Gaussian.
+This module is where the each Difference of Gaussian is computed for a single octave. It contains five Gaussian filter blocks, where the output of one block is fed into the input of the next block. The time between the first valid pixel of one block and the first valid pixel of the next block is determined by the time it takes for one pixel to travel through an entire Gaussian filter. To compute a Difference of Gaussian, the same pixel from each Gaussian filter block needs to be used, despite the delay between the two blocks. This means that the output of the first Gaussian must be stored in a shift register with a depth equal to that delay, while also being routed to the next Gaussian filter block. The output of the next Gaussian is then subtracted from the output of the shift register. The result is the Difference of Gaussian. In order to make the Difference of Gaussian more visible, the result is also multiplied by eight (implemented as a left shift by three).
 
 The blanking signal also needs to be delayed, however the second of the two 
 Gaussians already takes care that, so the Difference of Gaussian simply uses the 
@@ -404,9 +396,11 @@ is similarly asserted for 20 cycles at the end of a row of the image and for
 for the rest of the pipeline to process.
 
 \subsubsection{Upsampler}
-
-
 % [todo] - upsampler
+This module takes our processed 400x300 images and scales them up by 2x in each
+direction to produce an 800x600 image. 
+
+
 
 \subsection{Control}
 
@@ -432,18 +426,18 @@ Gaussian filter block (x\_window, five\_row\_array, and y\_window). The total de
 is then (3*width)+12, where width is the number of pixels in one line, including 
 blanking. Suppose width = 420, and the octave receives a constant stream of 
 valid outputs starting at cycle 0. Then:
+
 g0\_valid = 1 @ cycle 1272
-d0\_valid = 1 @ cycle 2544
 g1\_valid = 1 @ cycle 2544
-d1\_valid = 1 @ cycle 3816
+d0\_valid = 1 @ cycle 2545
 g2\_valid = 1 @ cycle 3816
-d2\_valid = 1 @ cycle 5088
+d1\_valid = 1 @ cycle 3817
 g3\_valid = 1 @ cycle 5088
-d3\_valid = 1 @ cycle 6360
+d2\_valid = 1 @ cycle 5089
 g4\_valid = 1 @ cycle 6360
-This can also be seen in the timing diagram below: <insert\_diagram\_here>
-Any stall in the pipeline (i.e. an invalid input into the octave for n number of 
-cycles) will cause an additional delay.
+d3\_valid = 1 @ cycle 6361
+
+Note that the output for each Difference of Gaussian is delayed by one extra cycle. This is because there is a register after the subtraction and right shift operations to pipeline the output. Any stall in the pipeline (i.e. an invalid input into the octave for n number of cycles) will cause an additional delay.
 
 \paragraph{five\_by\_five\_window.v}
 This module does not need any control signals. However, it does generate the 
@@ -475,19 +469,7 @@ module. A timing diagram demonstrating the relationship between validin, the
 counter, and validout is below: <insert\_diagram\_here>
 
 \paragraph{five\_row\_array.v}
-This module does need one control signal, asel. What this signal is used for was 
-discussed in the previous section on this modules datapath, and how this 
-signal is generated was discussed in the previous section on five\_by\_five\_window 
-control signals. This module also does not generate any control signals. It does 
-have a simple counter to determine if the pipeline has filled up enough so that 
-the output is valid. This counter will increment as long as there is a valid 
-input, and the count is less than 3*width, where width is the number of pixels 
-in a row (including blanking). Once the count has reached 3*width, the counter 
-will stop incrementing unless the module is reset. The output of the module is 
-invalid if the counter is less than 3*width, or the input is not valid. This 
-also means that an invalid input will stall this module. A timing diagram 
-demonstrating the relationship between validin, the counter, and validout is 
-below: <insert\_diagram\_here>
+This module does need one control signal, asel. What this signal is used for was discussed in the previous section on this module's datapath, and how this signal is generated was discussed in the previous section on five\_by\_five\_window control signals. This module also does not generate any control signals. It does have a simple counter to determine if the pipeline has filled up enough so that the output is valid. This counter will increment as long as there is a valid input, and the count is less than 3*width, where width is the number of pixels in a row (including blanking). Once the count has reached 3*width, the counter will stop incrementing unless the module is reset. The output of the module is invalid if the counter is less than 3*width, or the input is not valid. This also means that an invalid input will stall this module.
 
 \paragraph{y\_window.v}
 This module does need one control signal, hsel. What this signal is used for was 
@@ -505,19 +487,7 @@ relationship between validin, the counter, and validout is below:
 <insert\_diagram\_here>
 
 \paragraph{Image Switching}
-When switching inputs into the ImageBufferWriter, timing is critical. If the 
-switch is made at the wrong time, the output might be shifted over, or the swap 
-controller might get stalled. As mentioned in a previous section, GPIO\_DIP[3:8] 
-is the input to a register. The register is then connected to the mechanism that 
-determines which image writes into ImageBufferWriter. All that is needed is 
-a safe time to update that register. The best time to do this is right after the 
-ImageBufferWriter has completed one frame. Once the ImageBufferWriter signals 
-that it is finished, using bg\_done, the swap controller will send bg\_done\_ack. 
-Once that has happened, the ImageBufferReader, responsible for the DVI output, 
-will get a swap signal from the swap controller. After the ImageBufferReader 
-sends a swap\_ack, the swap controller will issue a start signal to VGA or 
-StaticImage, and wait for start\_ack. The following timing diagram illustrates 
-this process: <insert\_diagram\_here>
+When switching inputs into the ImageBufferWriter, timing is critical. If the switch is made at the wrong time, the output might be shifted over, or the swap controller might get stalled. As mentioned in a previous section, GPIO\_DIP[3:8] is the input to a register. The register is then connected to the mechanism that determines which image writes into ImageBufferWriter. All that is needed is a safe time to update that register. The best time to do this is right after the ImageBufferWriter has completed one frame. Once the ImageBufferWriter signals that it is finished, using bg\_done, the swap controller will send bg\_done\_ack. Once that has happened, the ImageBufferReader, responsible for the DVI output, will get a swap signal from the swap controller. After the ImageBufferReader sends a swap\_ack, the swap controller will issue a start signal (bg\_start) to VGA or StaticImage, and wait for start\_ack. StaticImage will return start\_ack one cycle later, but VGA may have a delay (since it will only issue a start\_ack at the end of a frame). The following timing diagram illustrates this process: <insert\_diagram\_here> Note that start\_ack may be delayed by one or more cycles if VGA is being used. If this happens, then bg\_start will stay high for the same amount of cycles as the delay.
 
 This gives us plenty of time to check if one of the switches has moved, reset 
 the entire pipeline (including each octave, downsampler, and upsampler), and 
