@@ -44,6 +44,7 @@ Essentially, its task is to mediate reads and writes between other modules that
 are competeting for access to our single port SRAM. The arbiter supports two 
 write ports, two read ports, and services a single request (either a single 
 read or a single write) per clock cycle.
+SRAM\_arbiter\_blackbox.png
 
 \subsubsection{Downsampler.v, Downsampler4x.v}
 The Downsampler module converts the original 800x600 image fed into our processing
@@ -58,6 +59,7 @@ signal that indicate whether the current output pixel is valid and/or a pixel
 in the blanking region respectively. Downsampler4x.v is identical to 
 Downsampler.v, excluding some constants that are modified to allow this version 
 to downsample from 400x300 images to 200x150 images.
+Downsampler\_blackbox.png
 
 \subsubsection{Upsampler.v, Upsampler4x.v}
 The Upsampler module converts the processed 400x300 image coming out of the processing
@@ -72,21 +74,25 @@ output is valid pixel data that we ultimately wish to display (blanking regions
 are non-existant at this point). Upsampler4x.v is identical to Upsampler.v, 
 excluding some constants that are modified to allow this version to upsample 
 from 200x150 images to 800x600 images.
+Upsampler\_blackbox.png
 
 \subsubsection{DownsamplerWrap.v, Downsampler4xWrap.v}
 This module attaches the Downsampler to its output fifo, which mediates between
 the Downsampler and the gaussian pipeline. This module spans both the first
 and second clock domains.
+Downsamplerwrap\_blackbox.png
 
 \subsubsection{UpsamplerWrap.v, Upsampler4xWrap.v}
 This module attaches the Upsampler to its input fifo, which mediates between
 the gaussian pipeline and the Upsampler. This module spans both the second and
 third clock domains.
+Upsamplerwrap\_blackbox.png
 
 \subsubsection{Check4.v, Check4\_4x.v}
 This module connects the entire Downsampler, Octave, and Upsampler pipeline together.
 Additionally, it provides the switching functionality that allows our design to 
 display any of the gaussians or differences on-demand.
+Check4\_blackbox.png
 
 \subsubsection{octave.v}
 The Octave module contains 5 Gaussian filter blocks and computes the four 
@@ -97,6 +103,7 @@ Difference of Gaussian. There is no blanking output since blanking pixels are
 considered invalid at the output. This module also has a special output just 
 for the next octave, which contains the data, valid, and blanking signal from 
 one of the Gaussian filters (the fourth one in this case).
+Octave\_blackbox.png
 
 \subsubsection{five\_by\_five\_window.v}
 This module represents one Gaussian filter block, with five coefficients in the 
@@ -105,6 +112,7 @@ is a stream of pixels (one at a time), along with a valid signal and a blanking
 signal. The output is also a stream of pixels (after going through the Gaussian 
 filter), along with a valid signal and a blanking signal. Pixels that are 
 marked as blanking are also replaced with zero prior to the output.
+five\_by\_five\_window\_blackbox.png
 
 \subsubsection{x\_window.v}
 This module is used to compute the horizontal portion of the Gaussian filter. 
@@ -114,6 +122,7 @@ location within the frame corresponds to the center of those five pixels. The
 input is a stream of pixels (one at a time), along with a valid signal and a 
 blanking signal. The output is also a stream of pixels (after computing the 
 horizontal Gaussian), along with a valid signal and a blanking signal.
+x\_window\_blackbox.png
 
 \subsubsection{five\_row\_array.v}
 This module is used to store five rows of pixels at a time, which becomes the 
@@ -125,6 +134,7 @@ frame, and come from consecutive lines within the frame. The center of these
 five consecutive lines is the pixel at the center of the Gaussian filter block, 
 so the blanking output corresponds to the blanking input for this particular 
 pixel.
+five\_row\_array\_blackbox.png
 
 \subsubsection{y\_window.v}
 This module computes the vertical portion of the Gaussian filter. It multiplies 
@@ -134,6 +144,7 @@ value within the frame corresponds to the center of the input pixels. The input
 is a stream of pixels (five at a time), along with a valid signal and blanking 
 signal. The output is also a stream of pixels (after computing the vertical 
 Gaussian), along with a valid signal and a blanking signal.
+y\_window\_blackbox.png
 
 \section{System Description}
 
@@ -176,8 +187,8 @@ by other modules within the octave, and indicate whether or not a particular
 pixel is part of the original image (not blanking), or was added in order to pad 
 the edges of the image (blanking). Blanking pixels are not used by any module 
 outside of the octave, so blanking pixels are simply considered invalid pixels 
-at the output. A diagram of a simple Difference of Gaussian is shown below: 
-<insert\_diagram\_here>
+at the output.
+octave.png
 
 \paragraph{five\_by\_five\_window.v}
 
@@ -211,6 +222,7 @@ running those zero pixels through an averaging filter will make them non-zero,
 which is why they need to be replaced by zeros between every filter block.
 The control signals generated by this module for five\_row\_array and y\_window 
 will be discussed in a later section.
+5x5\_block.png
 
 \paragraph{x\_window.v}
 
@@ -228,7 +240,9 @@ results at the edges of each line may not be accurate. To ensure proper results,
 there needs to be at least two blanking pixels at the end of this line (assuming 
 the horizontal Gaussian window takes in five pixels). The two pixels can act as 
 padding for both the previous line and the next line. An illustration of this 
-concept is shown below: <insert\_diagram\_here> Since all registers are set to 
+concept is shown below:
+serlial\_input.png
+Since all registers are set to 
 zero upon reset, including the registers that store previous pixel values, the 
 first two pixels of the frame are already padded.
 
@@ -259,6 +273,7 @@ The coefficients are scaled in such a way that the result of adding each term
 number. In order to scale this back down to an 8-bit number, we simply keep the 
 upper 8 bits and drop the lower 8. This is the same as dividing the result by 
 256, or shifting the result to the right by 8.
+x\_window.png
 
 \paragraph{five\_row\_array.v}
 This module stores the results of the x\_window module. Each output of x\_window 
@@ -277,7 +292,7 @@ array containing the oldest values gets replaced by newer values. Once that
 array is full, the module will begin filling/replacing the contents of the next 
 oldest array. An illustration of this concept is shown below: 
 
-<insert\_diagram\_here>
+io\_diagram.png
 
 The input signal asel is used to choose which array to shift the new value into. 
 This is a five-bit, one hot signal. Each bit corresponds to a particular 
@@ -302,6 +317,7 @@ being filled with new data is always rotating (according to the input asel).
 This means that the y\_window module needs to keep track of which line is which, 
 and select the appropriate coefficients for each line. How and where these 
 control signals are generated will be discussed in a later section.
+array.png
 
 \paragraph{y\_window.v} 
 
@@ -353,6 +369,7 @@ The coefficients are scaled in such a way that the result of adding each term
 number. In order to scale this back down to an 8-bit number, we simply keep the 
 upper 8 bits and drop the lower 8. This is the same as dividing the result by 
 256, or shifting the result to the right by 8.
+y\_window.png
 
 
 \subsubsection{Connections to ImageBufferWriter}
@@ -427,6 +444,7 @@ of the original image, plus 20 additional rows for blanking. The blankingout sig
 is similarly asserted for 20 cycles at the end of a row of the image and for
 20 rows at the end of a frame of the image. This produces a 420x320 input image
 for the rest of the pipeline to process.
+Downsampler.png
 
 \subsubsection{Upsampler}
 
@@ -449,6 +467,7 @@ additionally fills the shift register with 800 valid pixels), we switch our modu
 output to the output of the shift register and run for 800 cycles. This produces
 the duplicate row that we need for vertical scaling. This entire mechanism is
 controlled by a set of counters, which will be discussed in the control section.
+Upsampler.png
 
 \subsection{Control}
 
@@ -498,7 +517,10 @@ The state machines which generate asel and hsel will change states whenever the
 counter is equal to width-1. Both state machines are Moore machines which simply 
 rotate between five different states. These states correspond to the five 
 different ways in which the outputs of five\_row\_array can be arranged. The state 
-diagrams for these machines are below: <insert\_diagram\_here>
+diagrams for these machines are below:
+
+sel\_states.png
+
 This module also takes in a valid signal and outputs a valid signal. However, 
 this modules does not do anything to these signals; it simply feeds the input 
 into x\_window, and takes the output directly from y\_window. The behavior of this 
@@ -514,7 +536,8 @@ reached seven, the counter will stop incrementing unless the module is reset.
 The output of the module is invalid if the counter is less than seven, or the 
 input is not valid. This also means that an invalid input will stall this 
 module. A timing diagram demonstrating the relationship between validin, the 
-counter, and validout is below: <insert\_diagram\_here>
+counter, and validout is below:
+timing\_1.png
 
 \paragraph{five\_row\_array.v}
 This module does need one control signal, asel. What this signal is used for was discussed in the previous section on this module's datapath, and how this signal is generated was discussed in the previous section on five\_by\_five\_window control signals. This module also does not generate any control signals. It does have a simple counter to determine if the pipeline has filled up enough so that the output is valid. This counter will increment as long as there is a valid input, and the count is less than 3*width, where width is the number of pixels in a row (including blanking). Once the count has reached 3*width, the counter will stop incrementing unless the module is reset. The output of the module is invalid if the counter is less than 3*width, or the input is not valid. This also means that an invalid input will stall this module.
@@ -532,7 +555,7 @@ incrementing unless the module is reset. The output of the module is invalid if
 the counter is less than 5, or the input is not valid. This also means that an 
 invalid input will stall this module. A timing diagram demonstrating the 
 relationship between validin, the counter, and validout is below: 
-<insert\_diagram\_here>
+timing\_2.png
 
 
 \paragraph{Downsampler.v, Downsampler4x.v}
@@ -599,7 +622,9 @@ colcounter CE & validout \\
 
 
 \paragraph{Image Switching}
-When switching inputs into the ImageBufferWriter, timing is critical. If the switch is made at the wrong time, the output might be shifted over, or the swap controller might get stalled. As mentioned in a previous section, GPIO\_DIP[3:8] is the input to a register. The register is then connected to the mechanism that determines which image writes into ImageBufferWriter. All that is needed is a safe time to update that register. The best time to do this is right after the ImageBufferWriter has completed one frame. Once the ImageBufferWriter signals that it is finished, using bg\_done, the swap controller will send bg\_done\_ack. Once that has happened, the ImageBufferReader, responsible for the DVI output, will get a swap signal from the swap controller. After the ImageBufferReader sends a swap\_ack, the swap controller will issue a start signal (bg\_start) to VGA or StaticImage, and wait for start\_ack. StaticImage will return start\_ack one cycle later, but VGA may have a delay (since it will only issue a start\_ack at the end of a frame). The following timing diagram illustrates this process: <insert\_diagram\_here> Note that start\_ack may be delayed by one or more cycles if VGA is being used. If this happens, then bg\_start will stay high for the same amount of cycles as the delay.
+When switching inputs into the ImageBufferWriter, timing is critical. If the switch is made at the wrong time, the output might be shifted over, or the swap controller might get stalled. As mentioned in a previous section, GPIO\_DIP[3:8] is the input to a register. The register is then connected to the mechanism that determines which image writes into ImageBufferWriter. All that is needed is a safe time to update that register. The best time to do this is right after the ImageBufferWriter has completed one frame. Once the ImageBufferWriter signals that it is finished, using bg\_done, the swap controller will send bg\_done\_ack. Once that has happened, the ImageBufferReader, responsible for the DVI output, will get a swap signal from the swap controller. After the ImageBufferReader sends a swap\_ack, the swap controller will issue a start signal (bg\_start) to VGA or StaticImage, and wait for start\_ack. StaticImage will return start\_ack one cycle later, but VGA may have a delay (since it will only issue a start\_ack at the end of a frame). The following timing diagram illustrates this process:
+timing\_3.png
+Note that start\_ack may be delayed by one or more cycles if VGA is being used. If this happens, then bg\_start will stay high for the same amount of cycles as the delay.
 
 This gives us plenty of time to check if one of the switches has moved, reset 
 the entire pipeline (including each octave, downsampler, and upsampler), and 
@@ -618,7 +643,7 @@ cycles before the pipeline is actually ready to receive valid data. From the
 timing diagram above, we see that there will always be enough time to complete 
 a reset. Below is an image, taken from the Xilinx LogiCORE IP FIFO Generator 
 v9.1 User Guide, which demonstrates the behavior of a FIFO during a reset: 
-<insert\_diagram\_here>
+fifo\_timing.png
 
 \subsubsection{State diagrams and functional timing diagrams}
 
