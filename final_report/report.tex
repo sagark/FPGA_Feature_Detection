@@ -142,6 +142,26 @@ Gaussian), along with a valid signal and a blanking signal.
 \subsubsection{Connections to SRAM}
 
 % [todo] - connections to SRAM
+All interfacing with the SRAM in our design is done solely through the SRAM 
+Arbiter designed in Checkpoint 2. This Arbiter follows the following state
+transition rules when determining order-of-service for the two write and two read
+ports. For this module, a state-diagram is prohibitive since it simply consists
+of a complete graph over the 5 states (every possible transition exists). The 
+five states that the SRAM arbiter can enter are PAUSE and the servicing states 
+DOW0, DOW1, DOR0, and DOR1. Excluding the PAUSE state (which simply indicates 
+that there are no requests being
+processed), state names can be decoded in the following manner: the last two characters
+stand for the port that is being serviced while the arbiter is in that state.
+If we order the servicing states as they are presented above, we can see the priority given
+to state transitions in our FSM. For example, if we are currently in state DOW1,
+we will service the R0 port if a read requests exists there, the R1 port if a 
+read requests exists there and not at R0, the W0 port if neither R0 or R1 have 
+a request and W0 does and finally the W1 port again if there a request exists
+and no other ports have a request. In any of our servicing states, if none of 
+the ports have pending requests, we enter the PAUSE state, which follows the
+same priority as the W1 state would. In this way, we maintain fairness of 
+access to the SRAM, allowing different parts of our pipeline to interact
+with the SRAM throughout execution.
 
 \subsubsection{Difference of Gaussian Filter Blocks}
 
@@ -379,9 +399,6 @@ Instead, these values are stored in a register and that register is updated at
 a time when it is safe to switch. The details of this implementation and the 
 timing will be discussed in a later section.
 
-\subsubsection{Connections to Frame Buffer}
-
-% [todo] - connections to frame buffer
 
 \subsubsection{Downsampler}
 This module achieves two main data pre-processing goals for our system. Firstly,
