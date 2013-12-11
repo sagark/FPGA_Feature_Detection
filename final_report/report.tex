@@ -437,7 +437,7 @@ the fifo from which we are reading data to maintain each valid output on its
 data output line for exactly two cycles. Because we are utilizing the 
 first-word-fall-through functionality of the FIFOs, we do not need to explicitly 
 assert read enable in order to ``get'' values. Rather, the next value that the
-fifo is able to represent is simply held there until we request the ``next'' value.
+fifo is able to present is simply held at its output until we request the ``next'' value.
 Thus, upon seeing the assertion of the valid signal of the upsampler fifo, we simply
 wait one clock cycle before asserting our read enable signal to ``clear out'' the old
 value. Thus, as far as our output is concerned, we receive two copies of each valid
@@ -533,6 +533,70 @@ the counter is less than 5, or the input is not valid. This also means that an
 invalid input will stall this module. A timing diagram demonstrating the 
 relationship between validin, the counter, and validout is below: 
 <insert\_diagram\_here>
+
+
+\paragraph{Downsampler.v, Downsampler4x.v}
+This module contains various control signals, all of which are driven by either
+a modulo or equality computation on a set of counters. These counters naturally
+represent our row number and column number in the frame currently being downsampled.
+These counters assume that the first valid we recieve is the first valid pixel in a 
+frame. The counters then increment as we would expect when receiving a stream of pixels - 
+the column (horizontal) counter increments every cycle where valid is asserted, 
+while the row (vertical) counter increments every cycle where the column counter
+has reached its maximum value (the width of the image minus one). Based on these
+values, the Downsampler generates what is effectively a control signal for the
+rest of the pipeline, its ``validout'' signal. For ease of reading, the table
+below presents the various computations done on the counters to genrate control / 
+intermediate signals in the downsampler. The labels presented correspond with
+those in the detailed downsampler block diagram shown earlier.
+
+%\begin{wraptable}{r}{10cm}
+\begin{figure}
+\caption{ Downsampler (2x) Control / Intermediate Signal Summary } \label{wrap-tab:2}
+\noindent \begin{tabular}{ c | c } \toprule
+Signal & Boolean Expression \\\toprule
+% [todo] - fix the actual numbers
+blankingregionin & colcounter $>$ 799 OR rowcounter $>$ 599 \\
+rowcounter reset & colcounter == 839 AND rowcounter == 639 \\
+colcounter reset & colcounter == 839 \\
+rowcounterCE & colcounter == 839 \\
+colcounterCE & blankingregionin OR valid \\
+validout & (colcounterCE) AND (rowcounter \% 2 == 0) AND (colcounter \% 2 == 0) \\
+\end{tabular}
+%\end{wraptable}
+\end{figure}
+
+\paragraph{Upsampler.v, Upsampler4x.v}
+This module contains various control signals, all of which are driven by either
+a modulo or equality computation on a set of counters. These counters naturally
+represent our row number and column number in the frame currently being upsampled. 
+These counters assume that the first valid we receive is the first valid pixel in the 
+input frame. The counters then increment as we would expect when receiving a stream
+of pixels. In this case, the column (horizontal) counter increments twice for
+every valid input that the Upsampler sees, and 800 times after receiving a complete
+valid row. The row (vertical) counter always increments immediately after the
+cycle during which column counter transitions from (image width - 2) to (image width - 1).
+These counters are then used as indicated in the table below to generate control
+signals for the rest of the module.
+
+%\begin{wraptable}{r}{10cm}
+\begin{figure}
+\caption{ Upsampler (2x) Control / Intermediate Signal Summary } \label{wrap-tab:3}
+\noindent \begin{tabular}{ c | c } \toprule
+Signal & Boolean Expression \\\toprule
+rmod4 & rowcounter \% 4 != 0 \\
+cmod4 & colcounter \% 4 == 3 \\
+fifo\_read & cmod4 AND (NOT rmod4) \\
+validout & rmod4 AND valid \\
+rowcounter reset & colcounter == 799 AND rowcounter == 599 \\
+colcounter reset & validout AND colcounter == 799 \\
+rowcounter CE & prev\_colcount == 798 AND colcount == 799 \\
+colcounter CE & validout \\
+\end{tabular}
+%\end{wraptable}
+\end{figure}
+
+
 
 \paragraph{Image Switching}
 When switching inputs into the ImageBufferWriter, timing is critical. If the switch is made at the wrong time, the output might be shifted over, or the swap controller might get stalled. As mentioned in a previous section, GPIO\_DIP[3:8] is the input to a register. The register is then connected to the mechanism that determines which image writes into ImageBufferWriter. All that is needed is a safe time to update that register. The best time to do this is right after the ImageBufferWriter has completed one frame. Once the ImageBufferWriter signals that it is finished, using bg\_done, the swap controller will send bg\_done\_ack. Once that has happened, the ImageBufferReader, responsible for the DVI output, will get a swap signal from the swap controller. After the ImageBufferReader sends a swap\_ack, the swap controller will issue a start signal (bg\_start) to VGA or StaticImage, and wait for start\_ack. StaticImage will return start\_ack one cycle later, but VGA may have a delay (since it will only issue a start\_ack at the end of a frame). The following timing diagram illustrates this process: <insert\_diagram\_here> Note that start\_ack may be delayed by one or more cycles if VGA is being used. If this happens, then bg\_start will stay high for the same amount of cycles as the delay.
