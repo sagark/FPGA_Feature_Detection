@@ -31,7 +31,7 @@ Abstract goes here.
 
 \subsection{Brief Description of Major Submodules}
 
-\subsubsection{Downsampler.v}
+\subsubsection{Downsampler.v, Downsampler4x.v}
 The Downsampler module converts the original 800x600 image fed into our processing
 pipeline into a 400x300 image to align with our hardware constraints. The downsampler
 takes in the image data as a stream of pixels along with a valid signal that is
@@ -41,9 +41,11 @@ blanking regions (sequences of black pixels) that are used to flush data
 through our gaussian pipeline. The downsampler ultimately outputs a scaled 
 image as a stream of pixels along with a valid signal and a blankingregion 
 signal that indicate whether the current output pixel is valid and/or a pixel
-in the blanking region respectively.
+in the blanking region respectively. Downsampler4x.v is identical to 
+Downsampler.v, excluding some constants that are modified to allow this version 
+to downsample from 400x300 images to 200x150 images.
 
-\subsubsection{Upsampler.v}
+\subsubsection{Upsampler.v, Upsampler4x.v}
 The Upsampler module converts the processed 400x300 image coming out of the processing
 pipeline back into a 800x600 image for display over the DVI interface. The upsampler
 takes in the processed image data as a stream of pixels along with a valid signal 
@@ -53,15 +55,9 @@ each pixel from the processed input and expanding it to cover a 2x2 box of
 pixels in the final output. The upsampler outputs a pixel at a time in the output 
 image along with a validout signal that is asserted whenever the data on the 
 output is valid pixel data that we ultimately wish to display (blanking regions
-are non-existant at this point).
-
-\subsubsection{Downsampler4x.v}
-This module is identical to Downsampler.v, excluding some constants that are 
-modified to allow this version to downsample from 400x300 images to 200x150 images.
-
-\subsubsection{Upsampler4x.v}
-This module is identical to Upsampler.v, excluding some constants that are 
-modified to allow this version to upsample from 200x150 images to 800x600 images.
+are non-existant at this point). Upsampler4x.v is identical to Upsampler.v, 
+excluding some constants that are modified to allow this version to upsample 
+from 200x150 images to 800x600 images.
 
 \subsubsection{DownsamplerWrap.v, Downsampler4xWrap.v}
 This module attaches the Downsampler to its output fifo, which mediates between
