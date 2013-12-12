@@ -8,7 +8,7 @@
 \usepackage[margin=1.0in]{geometry}
 \usepackage{amsmath,textcomp,amssymb,booktabs,geometry,graphicx,rotating,multirow,listings,wrapfig}
 
-\linespread{0.9}
+\linespread{0.85}
 
 \lstset{breaklines=true}
 
@@ -474,7 +474,6 @@ upper 8 bits and drop the lower 8. This is the same as dividing the result by
 
     \begingroup
     \tiny
-    \caption{ GPIO\_DIP switch positions for each output image. NOTE: Any missing binary numbers (switch combinations) are considered illegal and will cause the swap controller to stall.} \label{wrap-tab:1} 
 \begin{tabular}{ c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c } 
 Binary & 00000 & 00001 & 00010 & 00011 & 00100 & 00101 & 00110 & 00111 & 01000 \\ 
 Octave & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -484,6 +483,7 @@ Octave & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
 Image & gauss0 & gauss1 & gauss2 & gauss3 & gauss4 & diff0 & diff1 & diff2 & diff3 \\
 \end{tabular}
 \endgroup 
+    \caption{ GPIO\_DIP switch positions for each output image. NOTE: Any missing binary numbers (switch combinations) are considered illegal and will cause the swap controller to stall.} \label{wrap-tab:1} 
 \end{wraptable}
 
 
@@ -929,7 +929,6 @@ necessary to implement our design. From this point, we determined the expected
 amount of work for each module and attempted to balance the workload amongst ourselves.
 
 Sahar - Main processing pipeline, including octaves and gaussians (Everything inside of the Octave).
-
 Sagar - Support structures for the pipeline, including SRAM Arbiter, Down and Upsamplers, and
 overarching connections between the modules and FPGA\_TOP. (Everything outside of the Octave).
 
@@ -951,7 +950,7 @@ difference of gaussian outputs for display.
 \begin{itemize}\itemsep0em
     \item Attempt a 7x7 Window.
     \item Implement the design without Downsampling and Upsampling.
-    \item Switch roles (Implementing support structures instead of gaussian blocks and vice-versa).
+    \item Switch roles (i.e. Implementing support structures instead of gaussian blocks).
 \end{itemize}
 
 \end{document}
