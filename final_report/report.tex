@@ -316,7 +316,7 @@ first two pixels of the frame are already padded.
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{processed_image_pngs/serial_input.png}
-    \caption{Example of Serial Input}
+    \caption{The use of blanking pixels for x\_window. The array of boxes represents the input into x_window, from left to right. The value in each box represents the location of that pixel within the frame. The brackets below the array of boxes represent the five pixels used to compute the horizontal Gaussian for the center pixel. The blanking pixels between rows zero and one ensure that there is sufficient zero padding for the ends of the two rows.}
     \label{fig:serial}
 \end{figure}
 
@@ -371,14 +371,7 @@ input. This is done to ensure that a pixel of a particular position within
 a line (such as x=250) is in the same position within all 5 shift registers. The 
 array containing the oldest values gets replaced by newer values. Once that 
 array is full, the module will begin filling/replacing the contents of the next 
-oldest array. An illustration of this concept is shown in Figure \ref{fig:io}. 
-
-\begin{wrapfigure}{R}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/io_diagram.png}
-    \caption{IO Diagram}
-    \label{fig:io}
-\end{wrapfigure}
-
+oldest array.
 
 The input signal asel is used to choose which array to shift the new value into. 
 This is a five-bit, one hot signal. Each bit corresponds to a particular 
@@ -387,6 +380,14 @@ new data (instead of shifting in the old data). As long as each new value is
 shifted into the proper register in the proper order, then the outputs will also 
 be in the proper order. See the example in Figure \ref{fig:io} for a demonstration 
 on how this is accomplished.
+
+\begin{wrapfigure}{R}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/io_diagram.png}
+    \caption{Five Row Array Example}
+    \label{fig:io}
+\end{wrapfigure}
+
+In this simplified example, five_row_array only has three rows, each with width=4. Each set of four boxes represents a shift register, with its input on the right and its output on the left. The top image shows when one row (the third row in this case), is full. The outputs at this time are pixels (0,0), (0,1), and (0,2). In the next image, asel has switched, and now the top row is being filled/replaced. The output value is thrown out, and a new input value is pushed into the shift register. All other shift registers push their outputs back into their inputs. The outputs at this time are pixels (1,0), (1,1), and (1,2). The third image shows another value being pushed into the top row, and the outputs at this time are pixels (2,0), (2,1), and (2,2). The fourth image shows another value being pushed into the top row, and the outputs at this time are pixels (3,0), (3,1), and (3,2). The fifth image shows the top row now filled with new values, an the output is now (0,3), (0,1), and (0,2). In the final image, asel has switched again, and now the middle row is being filled/replaced. The outputs at this time are (1,3), (1,1), and (1,2). Using this method, five_row_array continues to output values in the correct order. After each consecutive cycle, the x value of the outputs increases by 1, and the y values are also consecutive (even if they are not in the correct order). The y values switch from [0,1,2] to [3,1,2] after a new row has been inputted.
 
 Only the first three rows need to be filled before there is a valid output. This 
 is because the shift registers are set to 0 upon reset, so two of the rows can 
@@ -473,7 +474,7 @@ upper 8 bits and drop the lower 8. This is the same as dividing the result by
 
     \begingroup
     \tiny
-    \caption{ NOTE: Any missing binary numbers (switch combinations) are considered illegal 
+    \caption{ GPIO_DIP switch positions for each output image. NOTE: Any missing binary numbers (switch combinations) are considered illegal 
 and will cause the swap controller to stall.} \label{wrap-tab:1} 
 \begin{tabular}{ c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c } 
 Binary & 00000 & 00001 & 00010 & 00011 & 00100 & 00101 & 00110 & 00111 & 01000 \\ 
@@ -614,7 +615,7 @@ output will begin to stream valid pixels.
  g4\_valid & 6360 \\
  d3\_valid & 6361 \\
 \end{tabular}
-\caption{ stuff }\label{wrap-tab:valids}
+\caption{Valid Output Timing. This table lists the number of cycles it will take until an output is valid (assuming it receives a constant stream of valid inputs).}\label{wrap-tab:valids}
 \end{wraptable}
 
 Note that the output for each Difference of Gaussian is delayed by one extra cycle. This is because there is a register after the subtraction and right shift operations to pipeline the output. Any stall in the pipeline (i.e. an invalid input into the octave for n number of cycles) will cause an additional delay.
@@ -671,7 +672,7 @@ relationship between validin, the counter, and validout.
 %\end{figure}
 \begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/timing_1.png}
-    \caption{Timing Diagram}
+    \caption{Timing Diagram for X Window Validout}
     \label{fig:timing_1}
 \end{wrapfigure}
 
@@ -703,7 +704,7 @@ demonstrates the relationship between validin, the counter, and validout.
 
 \begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/timing_2.png}
-    \caption{Timing Diagram}
+    \caption{Timing Diagram for Y Window Validout}
     \label{fig:timing_2}
 \end{wrapfigure}
 
@@ -775,7 +776,7 @@ When switching inputs into the ImageBufferWriter, timing is critical. If the swi
 
 \begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/timing_3.png}
-    \caption{Timing Diagram}
+    \caption{Timing Diagram for SwapController IO at the End of a Frame}
     \label{fig:timing_3}
 \end{wrapfigure}
 
@@ -802,7 +803,7 @@ v9.1 User Guide, depicts the behavior of a FIFO during an asynchronous reset.
 
 \begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/fifo_timing.png}
-    \caption{Fifo Timing Diagram from Xilinx User Guide}
+    \caption{FIFO Reset Behavior Timing Diagram from Xilinx User Guide}
     \label{fig:fifo_timing}
 \end{wrapfigure}
 
