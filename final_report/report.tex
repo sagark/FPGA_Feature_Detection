@@ -57,16 +57,15 @@ See Figure \ref{fig:full_pipe}.
 
 The SRAM arbiter is the main interface between SRAM and the rest of our system.
 Essentially, its task is to mediate reads and writes between other modules that
-are competeting for access to our single port SRAM. The arbiter supports two 
+are competing for access to our single port SRAM. The arbiter supports two 
 write ports, two read ports, and services a single request (either a single 
 read or a single write) per clock cycle.
-SRAM\_arbiter\_blackbox.png
 
 \subsubsection{Check4.v, Check4\_4x.v}
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\textwidth]{processed_image_pngs/Check4.png}
+    \includegraphics[width=0.75\textwidth]{processed_image_pngs/Check4.png}
     \caption{Check4.v Block Diagram}
     \label{fig:check_4}
 \end{figure}
@@ -80,7 +79,7 @@ a detailed connection diagram.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\textwidth]{processed_image_pngs/DownsamplerWrap.png}
+    \includegraphics[width=0.75\textwidth]{processed_image_pngs/DownsamplerWrap.png}
     \caption{DownsamplerWrap.v Block Diagram}
     \label{fig:down_wrap}
 \end{figure}
@@ -202,16 +201,16 @@ black-box diagram.
 
 \subsubsection{Connections to SRAM}
 
-% [todo] - connections to SRAM
 All interfacing with the SRAM in our design is done solely through the SRAM 
-Arbiter designed in Checkpoint 2. This Arbiter follows the following state
-transition rules when determining order-of-service for the two write and two read
-ports. For this module, a state-diagram is prohibitive since it simply consists
+Arbiter designed in Checkpoint 2. This Arbiter follows a predefined set of 
+transition rules for determining order-of-service for the two write and two read
+ports that we will mention shortly. Although we would traditionally use a state diagram to describe this, for 
+this module, a state-diagram is prohibitive since it simply consists
 of a complete graph over the 5 states (every possible transition exists). The 
-five states that the SRAM arbiter can enter are PAUSE and the servicing states 
-DOW0, DOW1, DOR0, and DOR1. Excluding the PAUSE state (which simply indicates 
-that there are no requests being
-processed), state names can be decoded in the following manner: the last two characters
+five states that the SRAM arbiter can enter are the servicing states 
+DOW0, DOW1, DOR0, and DOR1 and a PAUSE state in which no requests are serviced. 
+Excluding the PAUSE state,
+state names can be decoded in the following manner: the last two characters
 stand for the port that is being serviced while the arbiter is in that state.
 If we order the servicing states as they are presented above, we can see the priority given
 to state transitions in our FSM. For example, if we are currently in state DOW1,
@@ -249,7 +248,7 @@ at the output.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\textwidth]{processed_image_pngs/5x5_block.png}
+    \includegraphics[width=0.75\textwidth]{processed_image_pngs/5x5_block.png}
     \caption{5x5 Window Block Diagram}
     \label{fig:five_window}
 \end{figure}
@@ -317,7 +316,7 @@ first two pixels of the frame are already padded.
 \begin{figure}
     \centering
     \includegraphics[width=0.8\textwidth]{processed_image_pngs/serial_input.png}
-    \caption{Diagram of Serial Input}
+    \caption{Example of Serial Input}
     \label{fig:serial}
 \end{figure}
 
@@ -374,7 +373,7 @@ array containing the oldest values gets replaced by newer values. Once that
 array is full, the module will begin filling/replacing the contents of the next 
 oldest array. An illustration of this concept is shown in Figure \ref{fig:io}. 
 
-\begin{wrapfigure}{r}{0.25\textwidth}
+\begin{wrapfigure}{R}{0.25\textwidth}
     \includegraphics[width=0.23\textwidth]{processed_image_pngs/io_diagram.png}
     \caption{IO Diagram}
     \label{fig:io}
@@ -466,39 +465,25 @@ number. In order to scale this back down to an 8-bit number, we simply keep the
 upper 8 bits and drop the lower 8. This is the same as dividing the result by 
 256, or shifting the result to the right by 8.
 
-
 \subsubsection{Connections to ImageBufferWriter}
 
-\begin{wraptable}{r}{5.5cm}
+\begin{wraptable}{R}{0.67\textwidth}
 
     % [todo] - transpose the table for space fix
 
     \begingroup
     \tiny
     \caption{ NOTE: Any missing binary numbers (switch combinations) are considered illegal 
-and will cause the swap controller to stall.} \label{wrap-tab:1}
-\begin{tabular}{ c | c | c } \toprule
-Binary & Octave & Image\\\toprule
-00000 & 0 & gauss0\\ \midrule
-00001 & 0 & gauss1\\ \midrule
-00010 & 0 & gauss2\\ \midrule
-00011 & 0 & gauss3\\ \midrule
-00100 & 0 & gauss4\\ \midrule
-00101 & 0 & diff0\\  \midrule
-00110 & 0 & diff1\\  \midrule
-00111 & 0 & diff2\\  \midrule
-01000 & 0 & diff3\\  \midrule
-10000 & 1 & gauss0\\ \midrule
-10001 & 1 & gauss1\\ \midrule
-10010 & 1 & gauss2\\ \midrule
-10011 & 1 & gauss3\\ \midrule
-10100 & 1 & gauss4\\ \midrule
-10101 & 1 & diff0\\  \midrule
-10110 & 1 & diff1\\  \midrule
-10111 & 1 & diff2\\  \midrule
-11000 & 1 & diff3\\  \bottomrule
+and will cause the swap controller to stall.} \label{wrap-tab:1} 
+\begin{tabular}{ c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c } 
+Binary & 00000 & 00001 & 00010 & 00011 & 00100 & 00101 & 00110 & 00111 & 01000 \\ 
+Octave & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+Image & gauss0 & gauss1 & gauss2 & gauss3 & gauss4 & diff0 & diff1 & diff2 & diff3 \\ \toprule
+Binary & 10000 & 10001 & 10010 & 10011 & 10100 & 10101 & 10110 & 10111 & 11000 \\
+Octave & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\
+Image & gauss0 & gauss1 & gauss2 & gauss3 & gauss4 & diff0 & diff1 & diff2 & diff3 \\
 \end{tabular}
-\endgroup
+\endgroup 
 \end{wraptable}
 
 
@@ -528,7 +513,7 @@ timing will be discussed in a later section.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.75\textwidth]{processed_image_pngs/Downsampler.png}
+    \includegraphics[width=0.8\textwidth]{processed_image_pngs/Downsampler.png}
     \caption{Downsampler Block Diagram}
     \label{fig:downsampler}
 \end{figure}
@@ -559,7 +544,7 @@ for the rest of the pipeline to process.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.75\textwidth]{processed_image_pngs/Upsampler.png}
+    \includegraphics[width=0.8\textwidth]{processed_image_pngs/Upsampler.png}
     \caption{Upsampler Block Diagram}
     \label{fig:upsampler}
 \end{figure}
@@ -589,6 +574,12 @@ controlled by a set of counters, which will be discussed in the control section.
 
 \subsubsection{Dealing with issues - blank rows, addressing issues}
 
+Our pipeline propagates a valid signal throughout. This automatically invalidates
+any bad data that would otherwise flow into our pipeline (for example blank rows
+and bad data caused by stalls). Additionally, we do not face any addressing issues;
+as long as we feed exactly 480,000 pixels per frame, the ImageBufferWriter takes
+care of address generation automatically.
+
 \subsubsection{General controller design, by module}
 
 \paragraph{octave.v}
@@ -611,15 +602,21 @@ blanking. Suppose width = 420, and the octave receives a constant stream of
 valid outputs starting at cycle 0. Table \ref{} lists during which cycle each
 output will begin to stream valid pixels.
 
-g0\_valid = 1 @ cycle 1272
-g1\_valid = 1 @ cycle 2544
-d0\_valid = 1 @ cycle 2545
-g2\_valid = 1 @ cycle 3816
-d1\_valid = 1 @ cycle 3817
-g3\_valid = 1 @ cycle 5088
-d2\_valid = 1 @ cycle 5089
-g4\_valid = 1 @ cycle 6360
-d3\_valid = 1 @ cycle 6361
+\begin{wraptable}{R}{5cm}
+\begin{tabular}{c | c} \toprule
+ Signal & Cycle Number \\\toprule
+ g0\_valid & 1272 \\
+ g1\_valid & 2544 \\
+ d0\_valid & 2545 \\
+ g2\_valid & 3816 \\
+ d1\_valid & 3817 \\
+ g3\_valid & 5088 \\
+ d2\_valid & 5089 \\
+ g4\_valid & 6360 \\
+ d3\_valid & 6361 \\
+\end{tabular}
+\caption{ stuff }\label{wrap-tab:valids}
+\end{wraptable}
 
 Note that the output for each Difference of Gaussian is delayed by one extra cycle. This is because there is a register after the subtraction and right shift operations to pipeline the output. Any stall in the pipeline (i.e. an invalid input into the octave for n number of cycles) will cause an additional delay.
 
@@ -636,13 +633,19 @@ rotate between five different states. These states correspond to the five
 different ways in which the outputs of five\_row\_array can be arranged. The state 
 diagrams for these machines are below:
 
-
-\begin{figure}
-    \centering
+\begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/sel_states.png}
     \caption{ASEL and HSEL FSM Diagrams}
     \label{fig:sel_states}
-\end{figure}
+\end{wrapfigure}
+
+
+%\begin{wrapfigure}
+%    %\centering
+%    \includegraphics[width=0.5\textwidth]{processed_image_pngs/sel_states.png}
+%    \caption{ASEL and HSEL FSM Diagrams}
+%    \label{fig:sel_states}
+%\end{wrapfigure}
 
 This module also takes in a valid signal and outputs a valid signal. However, 
 this modules does not do anything to these signals; it simply feeds the input 
@@ -661,12 +664,18 @@ input is not valid. This also means that an invalid input will stall this
 module. A timing diagram demonstrating the relationship between validin, the 
 counter, and validout is below:
 
-\begin{figure}
-    \centering
+%\begin{figure}
+%    \centering
+%    \includegraphics[width=0.5\textwidth]{processed_image_pngs/timing_1.png}
+%    \caption{Timing Diagram}
+%    \label{fig:timing_1}
+%\end{figure}
+\begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/timing_1.png}
     \caption{Timing Diagram}
     \label{fig:timing_1}
-\end{figure}
+\end{wrapfigure}
+
 
 
 \paragraph{five\_row\_array.v}
@@ -686,12 +695,20 @@ the counter is less than 5, or the input is not valid. This also means that an
 invalid input will stall this module. A timing diagram demonstrating the 
 relationship between validin, the counter, and validout is below: 
 
-\begin{figure}
-    \centering
+%\begin{figure}
+%    \centering
+%    \includegraphics[width=0.5\textwidth]{processed_image_pngs/timing_2.png}
+%    \caption{Timing Diagram}
+%    \label{fig:timing_2}
+%\end{figure}
+
+\begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/timing_2.png}
     \caption{Timing Diagram}
     \label{fig:timing_2}
-\end{figure}
+\end{wrapfigure}
+
+
 
 \paragraph{Downsampler.v, Downsampler4x.v}
 This module contains various control signals, all of which are driven by either
@@ -708,12 +725,8 @@ below presents the various computations done on the counters to genrate control 
 intermediate signals in the downsampler. The labels presented correspond with
 those in the detailed downsampler block diagram shown earlier.
 
-%\begin{wraptable}{r}{10cm}
-\begin{figure}
-    \begingroup
+\begin{wraptable}{R}{11cm}
     \tiny
-
-\caption{ Downsampler (2x) Control / Intermediate Signal Summary } \label{wrap-tab:2}
 \noindent \begin{tabular}{ c | c } \toprule
 Signal & Boolean Expression \\\toprule
 % [todo] - fix the actual numbers
@@ -724,12 +737,28 @@ rowcounterCE & colcounter == 839 \\
 colcounterCE & blankingregionin OR valid \\
 validout & (colcounterCE) AND (rowcounter \% 2 == 0) AND (colcounter \% 2 == 0) \\
 \end{tabular}
-%\end{wraptable}
-
-\endgroup
-\end{figure}
+\caption{ Downsampler (2x) Control / Intermediate Signal Summary } \label{wrap-tab:downsample}
+\end{wraptable}
 
 \paragraph{Upsampler.v, Upsampler4x.v}
+
+\begin{figure}
+    \centering
+\tiny
+\noindent \begin{tabular}{ c | c } \toprule
+Signal & Boolean Expression \\\toprule
+rmod4 & rowcounter \% 4 != 0 \\
+cmod4 & colcounter \% 4 == 3 \\
+fifo\_read & cmod4 AND (NOT rmod4) \\
+validout & rmod4 AND valid \\
+rowcounter reset & colcounter == 799 AND rowcounter == 599 \\
+colcounter reset & validout AND colcounter == 799 \\
+rowcounter CE & prev\_colcount == 798 AND colcount == 799 \\
+colcounter CE & validout \\
+\end{tabular}
+\caption{ Upsampler (2x) Control / Intermediate Signal Summary } \label{fig:upsamplersignals}
+\end{figure}
+
 This module contains various control signals, all of which are driven by either
 a modulo or equality computation on a set of counters. These counters naturally
 represent our row number and column number in the frame currently being upsampled. 
@@ -742,38 +771,15 @@ cycle during which column counter transitions from (image width - 2) to (image w
 These counters are then used as indicated in the table below to generate control
 signals for the rest of the module.
 
-%\begin{wraptable}{r}{10cm}
-\begin{figure}
-    \begingroup
-    \tiny
-\caption{ Upsampler (2x) Control / Intermediate Signal Summary } \label{wrap-tab:3}
-\noindent \begin{tabular}{ c | c } \toprule
-Signal & Boolean Expression \\\toprule
-rmod4 & rowcounter \% 4 != 0 \\
-cmod4 & colcounter \% 4 == 3 \\
-fifo\_read & cmod4 AND (NOT rmod4) \\
-validout & rmod4 AND valid \\
-rowcounter reset & colcounter == 799 AND rowcounter == 599 \\
-colcounter reset & validout AND colcounter == 799 \\
-rowcounter CE & prev\_colcount == 798 AND colcount == 799 \\
-colcounter CE & validout \\
-\end{tabular}
-%\end{wraptable}
-
-\endgroup
-\end{figure}
-
-
 
 \paragraph{Image Switching}
 When switching inputs into the ImageBufferWriter, timing is critical. If the switch is made at the wrong time, the output might be shifted over, or the swap controller might get stalled. As mentioned in a previous section, GPIO\_DIP[3:8] is the input to a register. The register is then connected to the mechanism that determines which image writes into ImageBufferWriter. All that is needed is a safe time to update that register. The best time to do this is right after the ImageBufferWriter has completed one frame. Once the ImageBufferWriter signals that it is finished, using bg\_done, the swap controller will send bg\_done\_ack. Once that has happened, the ImageBufferReader, responsible for the DVI output, will get a swap signal from the swap controller. After the ImageBufferReader sends a swap\_ack, the swap controller will issue a start signal (bg\_start) to VGA or StaticImage, and wait for start\_ack. StaticImage will return start\_ack one cycle later, but VGA may have a delay (since it will only issue a start\_ack at the end of a frame). The following timing diagram illustrates this process:
 
-\begin{figure}
-    \centering
+\begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/timing_3.png}
     \caption{Timing Diagram}
     \label{fig:timing_3}
-\end{figure}
+\end{wrapfigure}
 
 
 Note that start\_ack may be delayed by one or more cycles if VGA is being used. If this happens, then bg\_start will stay high for the same amount of cycles as the delay.
@@ -796,13 +802,20 @@ timing diagram above, we see that there will always be enough time to complete
 a reset. Below is an image, taken from the Xilinx LogiCORE IP FIFO Generator 
 v9.1 User Guide, which demonstrates the behavior of a FIFO during a reset: 
 
-
-\begin{figure}
-    \centering
+\begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/fifo_timing.png}
     \caption{Fifo Timing Diagram from Xilinx User Guide}
     \label{fig:fifo_timing}
-\end{figure}
+\end{wrapfigure}
+
+
+
+%\begin{figure}
+%    \centering
+%    \includegraphics[width=0.5\textwidth]{processed_image_pngs/fifo_timing.png}
+%    \caption{Fifo Timing Diagram from Xilinx User Guide}
+%    \label{fig:fifo_timing}
+%\end{figure}
 
 \subsection{Design Decisions and Tradeoffs}
 
