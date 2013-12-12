@@ -27,13 +27,9 @@ Abstract goes here.
 
 \section{Overview}
 
-% [todo] - reduce Overview length by a few lines
+\subsection{Design - Full Pipeline Black-Box Block Diagram}
 
-\subsection{Design - Block Diagrams}
-
-% [todo] - block diagrams
-
-% [todo] - SRAM arbiter diagram - ehh probably not
+\includegraphics[width=\textwidth]{processed_image_pngs/full_pipe_blackbox.png}
 
 \subsection{Brief Description of Major Submodules}
 
@@ -47,6 +43,11 @@ read or a single write) per clock cycle.
 SRAM\_arbiter\_blackbox.png
 
 \subsubsection{Downsampler.v, Downsampler4x.v}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Downsampler_blackbox.png}
+\end{wrapfigure}
+
 The Downsampler module converts the original 800x600 image fed into our processing
 pipeline into a 400x300 image to align with our hardware constraints. The downsampler
 takes in the image data as a stream of pixels along with a valid signal that is
@@ -59,9 +60,13 @@ signal that indicate whether the current output pixel is valid and/or a pixel
 in the blanking region respectively. Downsampler4x.v is identical to 
 Downsampler.v, excluding some constants that are modified to allow this version 
 to downsample from 400x300 images to 200x150 images.
-Downsampler\_blackbox.png
 
 \subsubsection{Upsampler.v, Upsampler4x.v}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Upsampler_blackbox.png}
+\end{wrapfigure}
+
 The Upsampler module converts the processed 400x300 image coming out of the processing
 pipeline back into a 800x600 image for display over the DVI interface. The upsampler
 takes in the processed image data as a stream of pixels along with a valid signal 
@@ -74,27 +79,42 @@ output is valid pixel data that we ultimately wish to display (blanking regions
 are non-existant at this point). Upsampler4x.v is identical to Upsampler.v, 
 excluding some constants that are modified to allow this version to upsample 
 from 200x150 images to 800x600 images.
-Upsampler\_blackbox.png
 
 \subsubsection{DownsamplerWrap.v, Downsampler4xWrap.v}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Downsamplerwrap_blackbox.png}
+\end{wrapfigure}
+
 This module attaches the Downsampler to its output fifo, which mediates between
 the Downsampler and the gaussian pipeline. This module spans both the first
 and second clock domains.
 Downsamplerwrap\_blackbox.png
 
 \subsubsection{UpsamplerWrap.v, Upsampler4xWrap.v}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Upsamplerwrap_blackbox.png}
+\end{wrapfigure}
+
 This module attaches the Upsampler to its input fifo, which mediates between
 the gaussian pipeline and the Upsampler. This module spans both the second and
 third clock domains.
-Upsamplerwrap\_blackbox.png
 
 \subsubsection{Check4.v, Check4\_4x.v}
+
+% [todo] - check4 blackbox representation Check4\_blackbox.png
+
 This module connects the entire Downsampler, Octave, and Upsampler pipeline together.
 Additionally, it provides the switching functionality that allows our design to 
 display any of the gaussians or differences on-demand.
-Check4\_blackbox.png
 
 \subsubsection{octave.v}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Octave_blackbox.png}
+\end{wrapfigure}
+
 The Octave module contains 5 Gaussian filter blocks and computes the four 
 Difference of Gaussian outputs. The module takes in a stream of pixels (one at 
 a time), along with a valid signal and a blanking signal. It will output a 
@@ -103,18 +123,26 @@ Difference of Gaussian. There is no blanking output since blanking pixels are
 considered invalid at the output. This module also has a special output just 
 for the next octave, which contains the data, valid, and blanking signal from 
 one of the Gaussian filters (the fourth one in this case).
-Octave\_blackbox.png
 
 \subsubsection{five\_by\_five\_window.v}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/five_by_five_window_blackbox.png}
+\end{wrapfigure}
+
 This module represents one Gaussian filter block, with five coefficients in the 
 horizontal direction and five coefficients in the vertical direction. The input 
 is a stream of pixels (one at a time), along with a valid signal and a blanking 
 signal. The output is also a stream of pixels (after going through the Gaussian 
 filter), along with a valid signal and a blanking signal. Pixels that are 
 marked as blanking are also replaced with zero prior to the output.
-five\_by\_five\_window\_blackbox.png
 
 \subsubsection{x\_window.v}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/x_window_blackbox.png}
+\end{wrapfigure}
+
 This module is used to compute the horizontal portion of the Gaussian filter. 
 It will multiply 5 pixels in the same row by their corresponding coefficients. 
 It will then take the average of those results to find the output value, whose 
@@ -122,9 +150,13 @@ location within the frame corresponds to the center of those five pixels. The
 input is a stream of pixels (one at a time), along with a valid signal and a 
 blanking signal. The output is also a stream of pixels (after computing the 
 horizontal Gaussian), along with a valid signal and a blanking signal.
-x\_window\_blackbox.png
 
 \subsubsection{five\_row\_array.v}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/five_row_array_blackbox.png}
+\end{wrapfigure}
+
 This module is used to store five rows of pixels at a time, which becomes the 
 input into the y\_window module. This module takes in a stream of input pixels 
 (one at a time), along with a valid signal and a blanking signal. It outputs 
@@ -134,9 +166,13 @@ frame, and come from consecutive lines within the frame. The center of these
 five consecutive lines is the pixel at the center of the Gaussian filter block, 
 so the blanking output corresponds to the blanking input for this particular 
 pixel.
-five\_row\_array\_blackbox.png
 
 \subsubsection{y\_window.v}
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/y_window_blackbox.png}
+\end{wrapfigure}
+
 This module computes the vertical portion of the Gaussian filter. It multiplies 
 5 input pixels (from the same column) by their corresponding coefficients, and 
 averages those results to find the output value. The location of the output 
@@ -144,7 +180,6 @@ value within the frame corresponds to the center of the input pixels. The input
 is a stream of pixels (five at a time), along with a valid signal and blanking 
 signal. The output is also a stream of pixels (after computing the vertical 
 Gaussian), along with a valid signal and a blanking signal.
-y\_window\_blackbox.png
 
 \section{System Description}
 
