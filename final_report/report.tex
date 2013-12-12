@@ -130,7 +130,7 @@ each pixel from the processed input and expanding it to cover a 2x2 box of
 pixels in the final output. The upsampler outputs a pixel at a time in the output 
 image along with a validout signal that is asserted whenever the data on the 
 output is valid pixel data that we ultimately wish to display (blanking regions
-are non-existant at this point). Upsampler4x.v is identical to Upsampler.v, 
+are non-existent at this point). Upsampler4x.v is identical to Upsampler.v, 
 excluding some constants that are modified to allow this version to upsample 
 from 200x150 images to 800x600 images. A black-box diagram of the Upsampler
 can be found in Figure \ref{fig:up_wrap}.
@@ -387,7 +387,7 @@ on how this is accomplished.
     \label{fig:io}
 \end{wrapfigure}
 
-In this simplified example, five\_row\_array only has three rows, each with width=4. Each set of four boxes represents a shift register, with its input on the right and its output on the left. The top image shows when one row (the third row in this case), is full. The outputs at this time are pixels (0,0), (0,1), and (0,2). In the next image, asel has switched, and now the top row is being filled/replaced. The output value is thrown out, and a new input value is pushed into the shift register. All other shift registers push their outputs back into their inputs. The outputs at this time are pixels (1,0), (1,1), and (1,2). The third image shows another value being pushed into the top row, and the outputs at this time are pixels (2,0), (2,1), and (2,2). The fourth image shows another value being pushed into the top row, and the outputs at this time are pixels (3,0), (3,1), and (3,2). The fifth image shows the top row now filled with new values, an the output is now (0,3), (0,1), and (0,2). In the final image, asel has switched again, and now the middle row is being filled/replaced. The outputs at this time are (1,3), (1,1), and (1,2). Using this method, five\_row\_array continues to output values in the correct order. After each consecutive cycle, the x value of the outputs increases by 1, and the y values are also consecutive (even if they are not in the correct order). The y values switch from [0,1,2] to [3,1,2] after a new row has been inputted.
+In this simplified example, five\_row\_array only has three rows, each with width=4. Each set of four boxes represents a shift register, with its input on the right and its output on the left. The top image shows when one row (the third row in this case), is full. The outputs at this time are pixels (0,0), (0,1), and (0,2). In the next image, asel has switched, and now the top row is being filled/replaced. The output value is thrown out, and a new input value is pushed into the shift register. All other shift registers push their outputs back into their inputs. The outputs at this time are pixels (1,0), (1,1), and (1,2). The third image shows another value being pushed into the top row, and the outputs at this time are pixels (2,0), (2,1), and (2,2). The fourth image shows another value being pushed into the top row, and the outputs at this time are pixels (3,0), (3,1), and (3,2). The fifth image shows the top row now filled with new values, and the output is now (0,3), (0,1), and (0,2). In the final image, asel has switched again, and now the middle row is being filled/replaced. The outputs at this time are (1,3), (1,1), and (1,2). Using this method, five\_row\_array continues to output values in the correct order. After each consecutive cycle, the x value of the outputs increases by 1, and the y values are also consecutive (even if they are not in the correct order). The y values switch from [0,1,2] to [3,1,2] after a new row has been inputted.
 
 Only the first three rows need to be filled before there is a valid output. This 
 is because the shift registers are set to 0 upon reset, so two of the rows can 
@@ -498,7 +498,7 @@ Gaussian outputs. The value of selector is determined by GPIO\_DIP[3:6]. Inside
 of FPGA\_TOP\_ML505, we use GPIO\_DIP[7] to choose which upsampler to connect to 
 ImageBufferWriter. If we consider GPIO\_DIP[3:7] (a particular combination of 
 switches) to be a 5-bit binary number, then the Table \ref{wrap-tab:1} summarizes the
-correspondance between this number and the output image.
+correspondence between this number and the output image.
 
 
 Switching the input to ImageBufferWriter at the wrong time could result in 
@@ -661,7 +661,7 @@ there is a valid input, and the count is less than seven. Once the count has
 reached seven, the counter will stop incrementing unless the module is reset. 
 The output of the module is invalid if the counter is less than seven, or the 
 input is not valid. This also means that an invalid input will stall this 
-module. The timing diagram in Figure \ref{fig:timing_1} demostrates the 
+module. The timing diagram in Figure \ref{fig:timing_1} demonstrates the 
 relationship between validin, the counter, and validout.
 
 %\begin{figure}
@@ -714,14 +714,14 @@ demonstrates the relationship between validin, the counter, and validout.
 This module contains various control signals, all of which are driven by either
 a modulo or equality computation on a set of counters. These counters naturally
 represent our row number and column number in the frame currently being downsampled.
-These counters assume that the first valid we recieve is the first valid pixel in a 
+These counters assume that the first valid we receive is the first valid pixel in a 
 frame. The counters then increment as we would expect when receiving a stream of pixels - 
 the column (horizontal) counter increments every cycle where valid is asserted, 
 while the row (vertical) counter increments every cycle where the column counter
 has reached its maximum value (the width of the image minus one). Based on these
 values, the Downsampler generates what is effectively a control signal for the
 rest of the pipeline, its ``validout'' signal. For ease of reading, Table \ref{wrap-tab:downsample}
-presents the various computations done on the counters to genrate control / 
+presents the various computations done on the counters to generate control / 
 intermediate signals in the downsampler. The labels presented correspond with
 those in the detailed downsampler block diagram shown earlier.
 
@@ -860,7 +860,7 @@ to determine control signals), we use only Moore Machines in our design.
 Much of the issues that arose during the implementation phase were due to 
 human error and timing issues as opposed to flaws in the original design. We relied
 mainly on authoring testbenches, confirming output in Modelsim, and physically 
-testing our impelementation with the VGA display.
+testing our implementation with the VGA display.
 
 None of these issues required significant changes to our design. Most of our solutions
 involved minimal changes to the original implementations. Ultimately 
