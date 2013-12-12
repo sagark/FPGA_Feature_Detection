@@ -805,12 +805,149 @@ v9.1 User Guide, which demonstrates the behavior of a FIFO during a reset:
     \label{fig:fifo_timing}
 \end{figure}
 
+\subsection{Design Decisions and Tradeoffs}
 
-\subsubsection{State diagrams and functional timing diagrams}
+\subsubsection{Padding}
+
+As opposed to ``resetting'' the entire pipeline at the end of each line
+and frame, we chose to take advantage of the VGA blanking period to generate
+blanking regions (valid pixels with value equal to zero). These blanking regions 
+serve two purposes: to provide zero
+padding for correct computation in the gaussian pipeline and to flush out 
+any remaining valid pixels in the pipeline at the end of a line or frame.
+This method is advantageous in that it eliminates the latency for
+repeatedly refilling the processing pipeline during our gaussian computation.
+
+\subsubsection{Clock Rates}
+
+Our system utilizes two separate clock domains, although it is capable of
+supporting up to three. In our implementation the DVI interface, image buffer, 
+SRAM, and the SRAM Arbiter all run on a clock of 50Mhz. The other domain, the
+bg\_clock domain (running at a frequency based on the VGA source clock), drives
+all other elements of our processing pipeline.
+
+Even though the design supports three separate clock domains due to initial concerns
+of a potential timing violation in the gaussian pipeline, the design in practice
+``ignores'' the middle clock domain. This domain was initially intended to run
+at a slower frequency to allow more time for segments of the gaussian pipeline 
+to complete. However, due to our extensive use of pipelining, the critical path was
+short enough such that a slower clock was not necessary. In our implementation,
+this middle domain is tied to the source (VGA) clock.
+
+\subsubsection{Moore vs. Mealy Machines}
+
+Because most of our state machines require knowledge of the position of a pixel
+in a given frame, we must be able to number each of the pixels inside of one 
+such frame. Additionally, most of our state machines also need to know the position
+of a pixel within a line. These two constraints lead us to using a dual-counter
+based control methodology for each state machine (one row counter and one column counter). 
+By nature of our counter FSMs (which apply mathematical operations on the current states 
+to determine control signals), we use only Moore Machines in our design.
+
+\subsubsection{Issues Encountered During Implementation}
+
+Much of the issues that arose during the implementation phase were due to 
+human error and timing issues as opposed to flaws in the original design. We relied
+mainly on authoring testbenches, confirming output in Modelsim, and physically 
+testing our impelementation with the VGA display.
+
+None of these issues required significant changes to our design. Most of our solutions
+involved minimal changes to the original implementations. Ultimately 
+due to the random nature of these malfunctions, we made little use of ChipScope in our
+debugging. Most of the time were not able to capture sufficient amounts of 
+data to determine the causes of issues using this technique.
 
 \section{Design Metrics}
 
+\subsection{Timing}
+
+In a visual inspection of the Post-PAR Static Timing Report, we determined the critical path to be
+the following:
+
+\noindent \begin{lstlisting}
+Location          Delay(ns)  Physical Resource
+                             Logical Resource(s)
+---------------------------  -------------------
+SLICE_X43Y87.AQ      0.450   ch/down_to_five_valid
+                             ch/down/fifo2/U0/
+                             xst_fifo_generator/
+                             gconvfifo.rf/
+                             grf.rf/gntv_or_sync_fifo.
+                             gl0.rd/gr1.rfwft/
+                             user_valid
+SLICE_X61Y65.D1      2.497   ch/down_to_five_valid
+SLICE_X61Y65.D       0.094   ch/oct/.gauss0a/
+                             my_x_window/
+                             valid_count<2>
+                             ch/oct/.gauss0a/my_x_window/
+                             validout1
+SLICE_X79Y56.B1      1.858   ch/oct/.gauss0a/xvalidout
+SLICE_X79Y56.B       0.094   ch/oct/.gauss0a/
+                             my_five_row_array/
+                             validout_cmp_eq0000
+                             ch/oct/.gauss0a/my_y_window/
+                             validout1
+SLICE_X97Y61.A1      1.795   ch/oct/gauss0_validout
+SLICE_X97Y61.A       0.094   ch/oct/.gauss1a/avalidout
+                             ch/oct/.gauss1a/
+                             my_five_row_array/validout1
+DSP48_X0Y55.CEP      6.868   ch/oct/.gauss1a/avalidout
+DSP48_X0Y55.CLK      0.728   ch/oct/.gauss1a/my_y_window/
+                             Mmult_B3_mult0001
+                             ch/oct/.gauss1a/my_y_window/
+                             Mmult_B3_mult0001
+---------------------------  ---------------------------
+Total               14.478ns (1.460ns logic, 13.018ns route)
+                             (10.1\% logic, 89.9\% route)
+\end{lstlisting}
+
+However, the minimum clock period reported to us by the tools was 17.060ns, 
+which results in a maximum frequency of 58.617 MHz.
+
+\subsection{Utilization}
+
+\begin{itemize}
+\item The number of LUTs used in our design was 14,442, for a utilization percentage of 20\%.
+\item The number of DSP units used in our design was 64, for a utilization percentage of 100\%.
+\item The number of BlockRAM/FIFOs used in our design was 13, for a utilization percentage of 8\%.
+\end{itemize}
+
+From these specs, it appears that we can theoretically produce a design that contains 50 gaussian filter blocks (five times as large as
+our existing design). However, this is misleading since at this point we have exhausted all of the 
+DSP resources available to us. Thus, any operation that would otherwise the use of a DSP unit (for example
+multiplication) now requires a large number of LUTs to implement. Thus the expected factor
+by which we can increase our design is actually far smaller.
+
+\subsection{Division of Labor}
+
+Upon receiving each checkpoint specification, we defined the modules and interfaces
+necessary to implement our design. From this point, we determined the expected 
+amount of work for each module and attempted to balance the workload amongst ourselves.
+
+Sahar - Main processing pipeline, including octaves and gaussians (Everything inside of the Octave).
+
+Sagar - Support structures for the pipeline, including SRAM Arbiter, Down and Upsamplers, and
+overarching connections between the modules and FPGA\_TOP. (Everything outside of the Octave).
+
+Implementation time: 15 Hours in Design, 12 Hours in Implementation, 50 Hours in Debugging (including one all-nighter).
+
 \section{Conclusion}
 
+Our pipeline accepts an 800x600 image via a VGA input interface. This image 
+is then downsampled to a 400x300 image to fit within our memory size constraints. 
+The downsampled image is then fed into a cascade of gaussian filter blocks. From this
+series of gaussian filter blocks, we derive outputs that are then subtracted to 
+produce our difference of gaussians output. This DoG output is then fed into 
+an upsampler to restore the original image size of 800x600 for display over
+the DVI interface. Additionally, the user can select between various gaussian and 
+difference of gaussian outputs for display.
+
+\subsection{Ideas for Future Improvement}
+
+\begin{itemize}
+    \item Attempt a 7x7 Window.
+    \item Implement the design without Downsampling and Upsampling.
+    \item Switch roles (Implementing support structures instead of gaussian blocks and vice-versa).
+\end{itemize}
 
 \end{document}
