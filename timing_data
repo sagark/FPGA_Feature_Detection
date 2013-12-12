@@ -1,0 +1,41 @@
+Minimum period is  17.060ns.
+Minimum period:  17.060ns{1}   (Maximum frequency:  58.617MHz)
+
+Slack (setup path):     85.552ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               ch/down/fifo2/U0/xst_fifo_generator/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/gr1.rfwft/user_valid (FF)
+  Destination:          ch/oct/.gauss1a/my_y_window/Mmult_B3_mult0001 (DSP)
+  Requirement:          100.000ns
+  Data Path Delay:      14.478ns (Levels of Logic = 3)
+  Clock Path Skew:      0.208ns (1.471 - 1.263)
+  Source Clock:         clk_10M rising at 0.000ns
+  Destination Clock:    clk_10M rising at 100.000ns
+  Clock Uncertainty:    0.178ns
+
+  Clock Uncertainty:          0.178ns  ((TSJ^2 + DJ^2)^1/2) / 2 + PE
+    Total System Jitter (TSJ):  0.070ns
+    Discrete Jitter (DJ):       0.349ns
+    Phase Error (PE):           0.000ns
+
+  Maximum Data Path: ch/down/fifo2/U0/xst_fifo_generator/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/gr1.rfwft/user_valid to ch/oct/.gauss1a/my_y_window/Mmult_B3_mult0001
+    Location             Delay type         Delay(ns)  Physical Resource
+                                                       Logical Resource(s)
+    -------------------------------------------------  -------------------
+    SLICE_X43Y87.AQ      Tcko                  0.450   ch/down_to_five_valid
+                                                       ch/down/fifo2/U0/xst_fifo_generator/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/gr1.rfwft/user_valid
+    SLICE_X61Y65.D1      net (fanout=63)       2.497   ch/down_to_five_valid
+    SLICE_X61Y65.D       Tilo                  0.094   ch/oct/.gauss0a/my_x_window/valid_count<2>
+                                                       ch/oct/.gauss0a/my_x_window/validout1
+    SLICE_X79Y56.B1      net (fanout=161)      1.858   ch/oct/.gauss0a/xvalidout
+    SLICE_X79Y56.B       Tilo                  0.094   ch/oct/.gauss0a/my_five_row_array/validout_cmp_eq0000
+                                                       ch/oct/.gauss0a/my_y_window/validout1
+    SLICE_X97Y61.A1      net (fanout=134)      1.795   ch/oct/gauss0_validout
+    SLICE_X97Y61.A       Tilo                  0.094   ch/oct/.gauss1a/avalidout
+                                                       ch/oct/.gauss1a/my_five_row_array/validout1
+    DSP48_X0Y55.CEP      net (fanout=26)       6.868   ch/oct/.gauss1a/avalidout
+    DSP48_X0Y55.CLK      Tdspcck_CEPP          0.728   ch/oct/.gauss1a/my_y_window/Mmult_B3_mult0001
+                                                       ch/oct/.gauss1a/my_y_window/Mmult_B3_mult0001
+    -------------------------------------------------  ---------------------------
+    Total                                     14.478ns (1.460ns logic, 13.018ns route)
+                                                       (10.1% logic, 89.9% route)
+
+
