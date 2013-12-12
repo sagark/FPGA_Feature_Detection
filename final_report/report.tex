@@ -534,9 +534,8 @@ dataout (the 8 bit pixel output), validout (a 1-bit signal that is asserted if
 the output data is either part of the output image or part of a blanking region), 
 and blankingregion (a 1 bit-signal that is asserted when the dataout value is
 a blanking region). The values fed into these registers are computed using 
-the output of a set of two counters, which we will discuss in detail in section 
-% [todo] - add section number in downsampler section
-. Essentially, the validout signal is asserted for 420 cycles for every other row 
+the output of a set of two counters, which we will discuss in detail in the control section. 
+Essentially, the validout signal is asserted for 420 cycles for every other row 
 of the original image, plus 20 additional rows for blanking. The blankingout signal
 is similarly asserted for 20 cycles at the end of a row of the image and for
 20 rows at the end of a frame of the image. This produces a 420x320 input image
@@ -567,7 +566,7 @@ pixel in the horizontal direction. Additionally, to produce the 2x duplication
 in the vertical direction, we take the output from our horizontal duplication ``stage''
 and feed it into a shift register that is 800 bytes wide. Thus, once we have
 processed an entire valid row of 400 input pixels (which outputs 800 valid pixels and 
-additionally fills the shift register with 800 valid pixels), we switch our modules 
+additionally fills the shift register with 800 valid pixels), we switch our module's 
 output to the output of the shift register and run for 800 cycles. This produces
 the duplicate row that we need for vertical scaling. This entire mechanism is
 controlled by a set of counters, which will be discussed in the control section.
@@ -721,8 +720,8 @@ the column (horizontal) counter increments every cycle where valid is asserted,
 while the row (vertical) counter increments every cycle where the column counter
 has reached its maximum value (the width of the image minus one). Based on these
 values, the Downsampler generates what is effectively a control signal for the
-rest of the pipeline, its ``validout'' signal. For ease of reading, the table
-below presents the various computations done on the counters to genrate control / 
+rest of the pipeline, its ``validout'' signal. For ease of reading, Table \ref{wrap-tab:downsample}
+presents the various computations done on the counters to genrate control / 
 intermediate signals in the downsampler. The labels presented correspond with
 those in the detailed downsampler block diagram shown earlier.
 
@@ -730,7 +729,6 @@ those in the detailed downsampler block diagram shown earlier.
     \tiny
 \noindent \begin{tabular}{ c | c } \toprule
 Signal & Boolean Expression \\\toprule
-% [todo] - fix the actual numbers
 blankingregionin & colcounter $>$ 799 OR rowcounter $>$ 599 \\
 rowcounter reset & colcounter == 839 AND rowcounter == 639 \\
 colcounter reset & colcounter == 839 \\
@@ -769,7 +767,7 @@ of pixels. In this case, the column (horizontal) counter increments twice for
 every valid input that the Upsampler sees, and 800 times after receiving a complete
 valid row. The row (vertical) counter always increments immediately after the
 cycle during which column counter transitions from (image width - 2) to (image width - 1).
-These counters are then used as indicated in the table below to generate control
+These counters are then used as indicated in Figure \ref{fig:upsamplersignals} to generate control
 signals for the rest of the module.
 
 
