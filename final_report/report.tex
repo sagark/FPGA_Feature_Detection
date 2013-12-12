@@ -259,10 +259,10 @@ at the output.
 This module is one Gaussian filter block. It is split into three sub-modules: 
 x\_window, five\_row\_array, and y\_window. This module serves four main purposes:
 1) To connect x\_window, five\_row\_array, and y\_window to each other and to the 
-   inputs and outputs of the five\_by\_five\_window module
-2) To generate control signals for five\_row\_array and y\_window
-3) To delay the blanking input and ensure a proper blanking output
-4) To replace any blanking input pixels and output pixels with zero
+   inputs and outputs of the five\_by\_five\_window module,
+2) To generate control signals for five\_row\_array and y\_window,
+3) To delay the blanking input and ensure a proper blanking output,
+4) To replace any blanking input pixels and output pixels with zero,
 x\_window, five\_row\_array, and y\_window were designed so that they would connect 
 directly to each other, in that particular order. The valid input into the 
 module is fed straight into x\_window, and the valid output of y\_window is 
@@ -310,7 +310,9 @@ results at the edges of each line may not be accurate. To ensure proper results,
 there needs to be at least two blanking pixels at the end of this line (assuming 
 the horizontal Gaussian window takes in five pixels). The two pixels can act as 
 padding for both the previous line and the next line. An illustration of this 
-concept is shown below:
+concept is shown in Figure \ref{fig:serial}. Since all registers are set to 
+zero upon reset, including the registers that store previous pixel values, the 
+first two pixels of the frame are already padded.
 
 \begin{figure}
     \centering
@@ -318,10 +320,6 @@ concept is shown below:
     \caption{Diagram of Serial Input}
     \label{fig:serial}
 \end{figure}
-
-Since all registers are set to 
-zero upon reset, including the registers that store previous pixel values, the 
-first two pixels of the frame are already padded.
 
 In order to ensure maximum clock frequency, there is a register between each 
 consecutive mathematical operation, such as a multiplication and addition. 
@@ -374,7 +372,7 @@ input. This is done to ensure that a pixel of a particular position within
 a line (such as x=250) is in the same position within all 5 shift registers. The 
 array containing the oldest values gets replaced by newer values. Once that 
 array is full, the module will begin filling/replacing the contents of the next 
-oldest array. An illustration of this concept is shown below: 
+oldest array. An illustration of this concept is shown in Figure \ref{fig:io}. 
 
 \begin{wrapfigure}{r}{0.25\textwidth}
     \includegraphics[width=0.23\textwidth]{processed_image_pngs/io_diagram.png}
@@ -388,8 +386,8 @@ This is a five-bit, one hot signal. Each bit corresponds to a particular
 shift register, and if that bit is 1 then the shift register will shift in the 
 new data (instead of shifting in the old data). As long as each new value is 
 shifted into the proper register in the proper order, then the outputs will also 
-be in the proper order. See the example above for a demonstration on how this is 
-accomplished.
+be in the proper order. See the example in Figure \ref{fig:io} for a demonstration 
+on how this is accomplished.
 
 Only the first three rows need to be filled before there is a valid output. This 
 is because the shift registers are set to 0 upon reset, so two of the rows can 
@@ -424,8 +422,8 @@ will receive five input pixels from the five\_row\_array. Each pixel is from the
 same position in a line (such as x=250), and comes from consecutive lines. It is 
 expected that the pixels will start from the leftmost position within a line, 
 and end at the rightmost position. It is also expected that the groups of lines 
-will be received in order from top to bottom (i.e. lines \lbrack 1,2,3,4,5 \rbrack followed by 
-lines \lbrack 2,3,4,5,6 \rbrack). These pixels are then multiplied by their corresponding 
+will be received in order from top to bottom (i.e. lines \lbrack 1,2,3,4,5\rbrack followed by 
+lines \lbrack 2,3,4,5,6\rbrack). These pixels are then multiplied by their corresponding 
 coefficients and the results are added together. This sum will then be scaled 
 back down to an 8-bit number. To ensure proper results, at least two extra lines 
 of zeros (blanking/padding), need to be added at the end of each frame. This is 
@@ -458,7 +456,7 @@ and the result is then fed into the multiplier (for each line). The same signal
 hsel is used for all five multiplexers. What is different is the order in which 
 the coefficients are attached to each multiplexer. This allows one signal, hsel, 
 to choose between the 5 different ways in which the outputs from five\_row\_array 
-can be arranged. As long as hsel and asel are in synch, and change at the same 
+can be arranged. As long as hsel and asel are in sync, and change at the same 
 time, the proper coefficients will be used. Details on how hsel and asel are 
 generated will be discussed in a later section.
 
@@ -514,8 +512,8 @@ used to choose between the five Gaussian outputs and the four Difference of
 Gaussian outputs. The value of selector is determined by GPIO\_DIP[3:6]. Inside 
 of FPGA\_TOP\_ML505, we use GPIO\_DIP[7] to choose which upsampler to connect to 
 ImageBufferWriter. If we consider GPIO\_DIP[3:7] (a particular combination of 
-switches) to be a 5-bit binary number, then the following table summarizes which 
-image each number corresponds to:
+switches) to be a 5-bit binary number, then the Table \ref{wrap-tab:1} summarizes the
+correspondance between this number and the output image.
 
 
 Switching the input to ImageBufferWriter at the wrong time could result in 
@@ -610,7 +608,8 @@ filter block. This delay is just the delay through all of the components of the
 Gaussian filter block (x\_window, five\_row\_array, and y\_window). The total delay 
 is then (3*width)+12, where width is the number of pixels in one line, including 
 blanking. Suppose width = 420, and the octave receives a constant stream of 
-valid outputs starting at cycle 0. Then:
+valid outputs starting at cycle 0. Table \ref{} lists during which cycle each
+output will begin to stream valid pixels.
 
 g0\_valid = 1 @ cycle 1272
 g1\_valid = 1 @ cycle 2544
