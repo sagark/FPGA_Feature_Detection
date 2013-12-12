@@ -29,7 +29,7 @@ Abstract goes here.
 
 \subsection{Design - Full Pipeline Black-Box Block Diagram}
 
-\includegraphics[width=\textwidth]{processed_image_pngs/full_pipe_blackbox.png}
+\includegraphics[width=0.7\textwidth]{processed_image_pngs/full_pipe_blackbox.png}
 
 \subsection{Brief Description of Major Submodules}
 
@@ -44,8 +44,8 @@ SRAM\_arbiter\_blackbox.png
 
 \subsubsection{Downsampler.v, Downsampler4x.v}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Downsampler_blackbox.png}
+\begin{wrapfigure}{r}{0.20\textwidth}
+    \includegraphics[width=0.19\textwidth]{processed_image_pngs/black_box_modules/Downsampler_blackbox.png}
 \end{wrapfigure}
 
 The Downsampler module converts the original 800x600 image fed into our processing
@@ -63,8 +63,8 @@ to downsample from 400x300 images to 200x150 images.
 
 \subsubsection{Upsampler.v, Upsampler4x.v}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Upsampler_blackbox.png}
+\begin{wrapfigure}{r}{0.20\textwidth}
+    \includegraphics[width=0.19\textwidth]{processed_image_pngs/black_box_modules/Upsampler_blackbox.png}
 \end{wrapfigure}
 
 The Upsampler module converts the processed 400x300 image coming out of the processing
@@ -82,19 +82,18 @@ from 200x150 images to 800x600 images.
 
 \subsubsection{DownsamplerWrap.v, Downsampler4xWrap.v}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Downsamplerwrap_blackbox.png}
+\begin{wrapfigure}{l}{0.20\textwidth}
+    \includegraphics[width=0.19\textwidth]{processed_image_pngs/black_box_modules/Downsamplerwrap_blackbox.png}
 \end{wrapfigure}
 
 This module attaches the Downsampler to its output fifo, which mediates between
 the Downsampler and the gaussian pipeline. This module spans both the first
 and second clock domains.
-Downsamplerwrap\_blackbox.png
 
 \subsubsection{UpsamplerWrap.v, Upsampler4xWrap.v}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Upsamplerwrap_blackbox.png}
+\begin{wrapfigure}{r}{0.20\textwidth}
+    \includegraphics[width=0.19\textwidth]{processed_image_pngs/black_box_modules/Upsamplerwrap_blackbox.png}
 \end{wrapfigure}
 
 This module attaches the Upsampler to its input fifo, which mediates between
@@ -111,8 +110,8 @@ display any of the gaussians or differences on-demand.
 
 \subsubsection{octave.v}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/Octave_blackbox.png}
+\begin{wrapfigure}{l}{0.20\textwidth}
+    \includegraphics[width=0.19\textwidth]{processed_image_pngs/black_box_modules/Octave_blackbox.png}
 \end{wrapfigure}
 
 The Octave module contains 5 Gaussian filter blocks and computes the four 
@@ -126,8 +125,8 @@ one of the Gaussian filters (the fourth one in this case).
 
 \subsubsection{five\_by\_five\_window.v}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/five_by_five_window_blackbox.png}
+\begin{wrapfigure}{r}{0.20\textwidth}
+    \includegraphics[width=0.19\textwidth]{processed_image_pngs/black_box_modules/five_by_five_window_blackbox.png}
 \end{wrapfigure}
 
 This module represents one Gaussian filter block, with five coefficients in the 
@@ -139,8 +138,8 @@ marked as blanking are also replaced with zero prior to the output.
 
 \subsubsection{x\_window.v}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/x_window_blackbox.png}
+\begin{wrapfigure}{r}{0.20\textwidth}
+    \includegraphics[width=0.19\textwidth]{processed_image_pngs/black_box_modules/x_window_blackbox.png}
 \end{wrapfigure}
 
 This module is used to compute the horizontal portion of the Gaussian filter. 
@@ -153,8 +152,8 @@ horizontal Gaussian), along with a valid signal and a blanking signal.
 
 \subsubsection{five\_row\_array.v}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/five_row_array_blackbox.png}
+\begin{wrapfigure}{r}{0.20\textwidth}
+    \includegraphics[width=0.19\textwidth]{processed_image_pngs/black_box_modules/five_row_array_blackbox.png}
 \end{wrapfigure}
 
 This module is used to store five rows of pixels at a time, which becomes the 
@@ -169,8 +168,8 @@ pixel.
 
 \subsubsection{y\_window.v}
 
-\begin{wrapfigure}{r}{0.25\textwidth}
-    \includegraphics[width=0.23\textwidth]{processed_image_pngs/black_box_modules/y_window_blackbox.png}
+\begin{wrapfigure}{r}{0.20\textwidth}
+    \includegraphics[width=0.19\textwidth]{processed_image_pngs/black_box_modules/y_window_blackbox.png}
 \end{wrapfigure}
 
 This module computes the vertical portion of the Gaussian filter. It multiplies 
@@ -211,6 +210,8 @@ with the SRAM throughout execution.
 
 \subsubsection{Difference of Gaussian Filter Blocks}
 
+\includegraphics[width=\textwidth]{processed_image_pngs/octave.png}
+
 \paragraph{octave.v}
 
 This module is where the each Difference of Gaussian is computed for a single octave. It contains five Gaussian filter blocks, where the output of one block is fed into the input of the next block. The time between the first valid pixel of one block and the first valid pixel of the next block is determined by the time it takes for one pixel to travel through an entire Gaussian filter. To compute a Difference of Gaussian, the same pixel from each Gaussian filter block needs to be used, despite the delay between the two blocks. This means that the output of the first Gaussian must be stored in a shift register with a depth equal to that delay, while also being routed to the next Gaussian filter block. The output of the next Gaussian is then subtracted from the output of the shift register. The result is the Difference of Gaussian. In order to make the Difference of Gaussian more visible, the result is also multiplied by eight (implemented as a left shift by three).
@@ -223,7 +224,8 @@ pixel is part of the original image (not blanking), or was added in order to pad
 the edges of the image (blanking). Blanking pixels are not used by any module 
 outside of the octave, so blanking pixels are simply considered invalid pixels 
 at the output.
-octave.png
+
+\includegraphics[width=\textwidth]{processed_image_pngs/5x5_block.png}
 
 \paragraph{five\_by\_five\_window.v}
 
@@ -257,7 +259,8 @@ running those zero pixels through an averaging filter will make them non-zero,
 which is why they need to be replaced by zeros between every filter block.
 The control signals generated by this module for five\_row\_array and y\_window 
 will be discussed in a later section.
-5x5\_block.png
+
+\includegraphics[width=\textwidth]{processed_image_pngs/x_window.png}
 
 \paragraph{x\_window.v}
 
@@ -276,7 +279,9 @@ there needs to be at least two blanking pixels at the end of this line (assuming
 the horizontal Gaussian window takes in five pixels). The two pixels can act as 
 padding for both the previous line and the next line. An illustration of this 
 concept is shown below:
-serlial\_input.png
+
+\includegraphics[width=\textwidth]{processed_image_pngs/serial_input.png}
+
 Since all registers are set to 
 zero upon reset, including the registers that store previous pixel values, the 
 first two pixels of the frame are already padded.
@@ -308,7 +313,8 @@ The coefficients are scaled in such a way that the result of adding each term
 number. In order to scale this back down to an 8-bit number, we simply keep the 
 upper 8 bits and drop the lower 8. This is the same as dividing the result by 
 256, or shifting the result to the right by 8.
-x\_window.png
+
+\includegraphics[width=\textwidth]{processed_image_pngs/array.png}
 
 \paragraph{five\_row\_array.v}
 This module stores the results of the x\_window module. Each output of x\_window 
@@ -327,7 +333,11 @@ array containing the oldest values gets replaced by newer values. Once that
 array is full, the module will begin filling/replacing the contents of the next 
 oldest array. An illustration of this concept is shown below: 
 
-io\_diagram.png
+%\includegraphics[width=\textwidth]{processed_image_pngs/io_diagram.png}
+\begin{wrapfigure}{r}{0.25\textwidth}
+    \includegraphics[width=0.23\textwidth]{processed_image_pngs/io_diagram.png}
+\end{wrapfigure}
+
 
 The input signal asel is used to choose which array to shift the new value into. 
 This is a five-bit, one hot signal. Each bit corresponds to a particular 
@@ -352,7 +362,9 @@ being filled with new data is always rotating (according to the input asel).
 This means that the y\_window module needs to keep track of which line is which, 
 and select the appropriate coefficients for each line. How and where these 
 control signals are generated will be discussed in a later section.
-array.png
+
+
+\includegraphics[width=0.8\textwidth]{processed_image_pngs/y_window.png}
 
 \paragraph{y\_window.v} 
 
@@ -404,12 +416,16 @@ The coefficients are scaled in such a way that the result of adding each term
 number. In order to scale this back down to an 8-bit number, we simply keep the 
 upper 8 bits and drop the lower 8. This is the same as dividing the result by 
 256, or shifting the result to the right by 8.
-y\_window.png
 
 
 \subsubsection{Connections to ImageBufferWriter}
 
 \begin{wraptable}{r}{5.5cm}
+
+    % [todo] - transpose the table for space fix
+
+    \begingroup
+    \tiny
     \caption{ NOTE: Any missing binary numbers (switch combinations) are considered illegal 
 and will cause the swap controller to stall.} \label{wrap-tab:1}
 \begin{tabular}{ c | c | c } \toprule
@@ -433,6 +449,7 @@ Binary & Octave & Image\\\toprule
 10111 & 1 & diff2\\  \midrule
 11000 & 1 & diff3\\  \bottomrule
 \end{tabular}
+\endgroup
 \end{wraptable}
 
 
@@ -459,6 +476,9 @@ timing will be discussed in a later section.
 
 
 \subsubsection{Downsampler}
+
+\includegraphics[width=\textwidth]{processed_image_pngs/Downsampler.png}
+
 This module achieves two main data pre-processing goals for our system. Firstly,
 it scales the input image from 800x600 pixels per frame to 400x300 pixels per frame.
 Additionally, it provides ``stable'' blanking region generation in order to 
@@ -479,9 +499,10 @@ of the original image, plus 20 additional rows for blanking. The blankingout sig
 is similarly asserted for 20 cycles at the end of a row of the image and for
 20 rows at the end of a frame of the image. This produces a 420x320 input image
 for the rest of the pipeline to process.
-Downsampler.png
 
 \subsubsection{Upsampler}
+
+\includegraphics[width=\textwidth]{processed_image_pngs/Upsampler.png}
 
 This module takes our processed 400x300 images and scales them up by 2x in each
 direction to produce an 800x600 image. The upsampler duplicates pixels using 
@@ -502,7 +523,6 @@ additionally fills the shift register with 800 valid pixels), we switch our modu
 output to the output of the shift register and run for 800 cycles. This produces
 the duplicate row that we need for vertical scaling. This entire mechanism is
 controlled by a set of counters, which will be discussed in the control section.
-Upsampler.png
 
 \subsection{Control}
 
@@ -554,7 +574,9 @@ rotate between five different states. These states correspond to the five
 different ways in which the outputs of five\_row\_array can be arranged. The state 
 diagrams for these machines are below:
 
-sel\_states.png
+
+\includegraphics[width=\textwidth]{processed_image_pngs/sel_states.png}
+
 
 This module also takes in a valid signal and outputs a valid signal. However, 
 this modules does not do anything to these signals; it simply feeds the input 
@@ -572,7 +594,8 @@ The output of the module is invalid if the counter is less than seven, or the
 input is not valid. This also means that an invalid input will stall this 
 module. A timing diagram demonstrating the relationship between validin, the 
 counter, and validout is below:
-timing\_1.png
+
+\includegraphics[width=\textwidth]{processed_image_pngs/timing_1.png}
 
 \paragraph{five\_row\_array.v}
 This module does need one control signal, asel. What this signal is used for was discussed in the previous section on this module's datapath, and how this signal is generated was discussed in the previous section on five\_by\_five\_window control signals. This module also does not generate any control signals. It does have a simple counter to determine if the pipeline has filled up enough so that the output is valid. This counter will increment as long as there is a valid input, and the count is less than 3*width, where width is the number of pixels in a row (including blanking). Once the count has reached 3*width, the counter will stop incrementing unless the module is reset. The output of the module is invalid if the counter is less than 3*width, or the input is not valid. This also means that an invalid input will stall this module.
@@ -590,8 +613,8 @@ incrementing unless the module is reset. The output of the module is invalid if
 the counter is less than 5, or the input is not valid. This also means that an 
 invalid input will stall this module. A timing diagram demonstrating the 
 relationship between validin, the counter, and validout is below: 
-timing\_2.png
 
+\includegraphics[width=\textwidth]{processed_image_pngs/timing_2.png}
 
 \paragraph{Downsampler.v, Downsampler4x.v}
 This module contains various control signals, all of which are driven by either
@@ -610,6 +633,9 @@ those in the detailed downsampler block diagram shown earlier.
 
 %\begin{wraptable}{r}{10cm}
 \begin{figure}
+    \begingroup
+    \tiny
+
 \caption{ Downsampler (2x) Control / Intermediate Signal Summary } \label{wrap-tab:2}
 \noindent \begin{tabular}{ c | c } \toprule
 Signal & Boolean Expression \\\toprule
@@ -622,6 +648,8 @@ colcounterCE & blankingregionin OR valid \\
 validout & (colcounterCE) AND (rowcounter \% 2 == 0) AND (colcounter \% 2 == 0) \\
 \end{tabular}
 %\end{wraptable}
+
+\endgroup
 \end{figure}
 
 \paragraph{Upsampler.v, Upsampler4x.v}
@@ -639,6 +667,8 @@ signals for the rest of the module.
 
 %\begin{wraptable}{r}{10cm}
 \begin{figure}
+    \begingroup
+    \tiny
 \caption{ Upsampler (2x) Control / Intermediate Signal Summary } \label{wrap-tab:3}
 \noindent \begin{tabular}{ c | c } \toprule
 Signal & Boolean Expression \\\toprule
@@ -652,13 +682,17 @@ rowcounter CE & prev\_colcount == 798 AND colcount == 799 \\
 colcounter CE & validout \\
 \end{tabular}
 %\end{wraptable}
+
+\endgroup
 \end{figure}
 
 
 
 \paragraph{Image Switching}
 When switching inputs into the ImageBufferWriter, timing is critical. If the switch is made at the wrong time, the output might be shifted over, or the swap controller might get stalled. As mentioned in a previous section, GPIO\_DIP[3:8] is the input to a register. The register is then connected to the mechanism that determines which image writes into ImageBufferWriter. All that is needed is a safe time to update that register. The best time to do this is right after the ImageBufferWriter has completed one frame. Once the ImageBufferWriter signals that it is finished, using bg\_done, the swap controller will send bg\_done\_ack. Once that has happened, the ImageBufferReader, responsible for the DVI output, will get a swap signal from the swap controller. After the ImageBufferReader sends a swap\_ack, the swap controller will issue a start signal (bg\_start) to VGA or StaticImage, and wait for start\_ack. StaticImage will return start\_ack one cycle later, but VGA may have a delay (since it will only issue a start\_ack at the end of a frame). The following timing diagram illustrates this process:
-timing\_3.png
+
+\includegraphics[width=\textwidth]{processed_image_pngs/timing_3.png}
+
 Note that start\_ack may be delayed by one or more cycles if VGA is being used. If this happens, then bg\_start will stay high for the same amount of cycles as the delay.
 
 This gives us plenty of time to check if one of the switches has moved, reset 
@@ -678,7 +712,8 @@ cycles before the pipeline is actually ready to receive valid data. From the
 timing diagram above, we see that there will always be enough time to complete 
 a reset. Below is an image, taken from the Xilinx LogiCORE IP FIFO Generator 
 v9.1 User Guide, which demonstrates the behavior of a FIFO during a reset: 
-fifo\_timing.png
+
+\includegraphics[width=\textwidth]{processed_image_pngs/fifo_timing.png}
 
 \subsubsection{State diagrams and functional timing diagrams}
 
