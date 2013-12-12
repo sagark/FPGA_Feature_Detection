@@ -87,8 +87,8 @@ module five_by_five_window #(
 
 	always @(posedge clock)
 		if (reset) x_count <= 0;
-		else if (validin & (x_count == width - 1)) x_count <= 0;
-		else if (validin) x_count <= x_count + 1;
+		else if (xvalidout & (x_count == width - 1)) x_count <= 0;
+		else if (xvalidout) x_count <= x_count + 1;
 
 	always @(posedge clock)
 		if (reset) asel <= 5'b00100;
