@@ -599,7 +599,7 @@ filter block. This delay is just the delay through all of the components of the
 Gaussian filter block (x\_window, five\_row\_array, and y\_window). The total delay 
 is then (3*width)+12, where width is the number of pixels in one line, including 
 blanking. Suppose width = 420, and the octave receives a constant stream of 
-valid outputs starting at cycle 0. Table \ref{} lists during which cycle each
+valid outputs starting at cycle 0. Table \ref{wrap-tab:valids} lists during which cycle each
 output will begin to stream valid pixels.
 
 \begin{wraptable}{R}{5cm}
@@ -630,8 +630,8 @@ including blanking), and increments when there is a valid output from x\_window.
 The state machines which generate asel and hsel will change states whenever the 
 counter is equal to width-1. Both state machines are Moore machines which simply 
 rotate between five different states. These states correspond to the five 
-different ways in which the outputs of five\_row\_array can be arranged. The state 
-diagrams for these machines are below:
+different ways in which the outputs of five\_row\_array can be arranged. Figure 
+\ref{fig:sel_states} depicts the state transition diagrams for these state machines.
 
 \begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/sel_states.png}
@@ -661,8 +661,8 @@ there is a valid input, and the count is less than seven. Once the count has
 reached seven, the counter will stop incrementing unless the module is reset. 
 The output of the module is invalid if the counter is less than seven, or the 
 input is not valid. This also means that an invalid input will stall this 
-module. A timing diagram demonstrating the relationship between validin, the 
-counter, and validout is below:
+module. The timing diagram in Figure \ref{fig:timing_1} demostrates the 
+relationship between validin, the counter, and validout.
 
 %\begin{figure}
 %    \centering
@@ -683,7 +683,7 @@ This module does need one control signal, asel. What this signal is used for was
 
 \paragraph{y\_window.v}
 This module does need one control signal, hsel. What this signal is used for was 
-discussed in the previous section on this modules datapath, and how this 
+discussed in the previous section on this module's datapath, and how this 
 signal is generated was discussed in the previous section on five\_by\_five\_window 
 control signals. This module also does not generate any control signals. It does 
 have a simple counter to determine if the pipeline has filled up enough so that 
@@ -692,8 +692,8 @@ input, and the count is less than 5, where width is the number of pixels in
 a row (including blanking). Once the count has reached 5, the counter will stop 
 incrementing unless the module is reset. The output of the module is invalid if 
 the counter is less than 5, or the input is not valid. This also means that an 
-invalid input will stall this module. A timing diagram demonstrating the 
-relationship between validin, the counter, and validout is below: 
+invalid input will stall this module. The timing diagram in Figure \ref{fig:timing_2} 
+demonstrates the relationship between validin, the counter, and validout.
 
 %\begin{figure}
 %    \centering
@@ -773,7 +773,7 @@ signals for the rest of the module.
 
 
 \paragraph{Image Switching}
-When switching inputs into the ImageBufferWriter, timing is critical. If the switch is made at the wrong time, the output might be shifted over, or the swap controller might get stalled. As mentioned in a previous section, GPIO\_DIP[3:8] is the input to a register. The register is then connected to the mechanism that determines which image writes into ImageBufferWriter. All that is needed is a safe time to update that register. The best time to do this is right after the ImageBufferWriter has completed one frame. Once the ImageBufferWriter signals that it is finished, using bg\_done, the swap controller will send bg\_done\_ack. Once that has happened, the ImageBufferReader, responsible for the DVI output, will get a swap signal from the swap controller. After the ImageBufferReader sends a swap\_ack, the swap controller will issue a start signal (bg\_start) to VGA or StaticImage, and wait for start\_ack. StaticImage will return start\_ack one cycle later, but VGA may have a delay (since it will only issue a start\_ack at the end of a frame). The following timing diagram illustrates this process:
+When switching inputs into the ImageBufferWriter, timing is critical. If the switch is made at the wrong time, the output might be shifted over, or the swap controller might get stalled. As mentioned in a previous section, GPIO\_DIP[3:8] is the input to a register. The register is then connected to the mechanism that determines which image writes into ImageBufferWriter. All that is needed is a safe time to update that register. The best time to do this is right after ImageBufferWriter has completed one frame. Once the ImageBufferWriter signals that it is finished, using bg\_done, the swap controller will send bg\_done\_ack. After that, ImageBufferReader, which is responsible for the DVI output, will get a swap signal from the swap controller. After ImageBufferReader sends a swap\_ack, the swap controller will issue a start signal (bg\_start) to VGA or StaticImage, and wait for start\_ack. StaticImage will return start\_ack one cycle later, but VGA may have a delay (since it will only issue a start\_ack at the end of a frame). The timing diagram in Figure \ref{fig:timing_3} illustrates this process.
 
 \begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/timing_3.png}
@@ -793,14 +793,14 @@ ImageBufferWriter. By resetting the pipeline, everything starts over, as if the
 next frame were actually the first frame. We need all of this time because it 
 takes more than one clock cycle to reset the FIFOs used in the upsampler and 
 downsampler. According to the Xilinx LogiCORE IP FIFO Generator v9.1 User Guide, 
-the FIFOs we are using have an asynchronous reset, and it takes three clock 
+the FIFOs we are using have an asynchronous reset, and it ``takes three clock 
 cycles (write or read) after the asynchronous reset is detected on the rising 
-edge read and write clock respectively. Since both the read and write ports 
+edge read and write clock respectively.'' Since both the read and write ports 
 of all of the FIFOs are on the same clock, that means it will take 3 clock 
 cycles before the pipeline is actually ready to receive valid data. From the 
 timing diagram above, we see that there will always be enough time to complete 
-a reset. Below is an image, taken from the Xilinx LogiCORE IP FIFO Generator 
-v9.1 User Guide, which demonstrates the behavior of a FIFO during a reset: 
+a reset. Figure \ref{fig:fifo_timing}, taken from the Xilinx LogiCORE IP FIFO Generator 
+v9.1 User Guide, depicts the behavior of a FIFO during an asynchronous reset.
 
 \begin{wrapfigure}{R}{0.51\textwidth}
     \includegraphics[width=0.5\textwidth]{processed_image_pngs/fifo_timing.png}
