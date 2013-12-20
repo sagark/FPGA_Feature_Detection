@@ -1,9 +1,12 @@
 //==============================================================================
-//	File:		$URL: svn+ssh://repositorypub@repository.eecs.berkeley.edu/public/Projects/GateLib/trunk/Firmware/Video/Hardware/Firmware/DVI/DVIInitial.v $
-//	Version:	$Revision: 26904 $
+//	File:		$URL: svn+ssh://repositorypub@repository.eecs.berkeley.edu/
+//     public/Projects/GateLib/trunk/Firmware/Video/Hardware/Firmware/DVI/
+//    DVIInitial.v $
+//	Version:	$Revision: 26904 $. Updated for UC Berkeley CS150 Fall 2013 Course
 //	Author:		Ilia lebedev (ilial@berkeley.edu)
 //				Greg Gibeling (http://www.gdgib.com)
 //				Kyle Wecker (wecker@berkeley.edu)
+//        Austin Buchan (abuchan@eecs.berkeley.edu)
 //	Copyright:	Copyright 2005-2010 UC Berkeley
 //==============================================================================
 
@@ -125,7 +128,7 @@ module	DVIInitial(//------------------------------------------------------------
   localparam  DviAddr = I2CAddress,
               VgaAddr = 7'h4C;
 
-
+  // VGA initialization information
   localparam  VgaCmd  = {
     VgaAddr, 8'h01, // PLL MSb
     VgaAddr, 8'h02, // PLL LSb
